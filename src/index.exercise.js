@@ -41,7 +41,19 @@ function LoginForm({onSubmit, submitButton}) {
         <label htmlFor="password">Password</label>
         <Input id="password" type="password" />
       </FormGroup>
-      <div>{React.cloneElement(submitButton, {type: 'submit'})}</div>
+      <div
+        css={{
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        {React.cloneElement(submitButton, {type: 'submit'})}
+        <Spinner
+          css={{
+            marginLeft: '5px',
+          }}
+        />
+      </div>
     </form>
   )
 }
@@ -90,7 +102,6 @@ function App() {
                 </Button>
               }
             />
-            <Spinner />
           </ModalContents>
         </Modal>
         <Modal>
