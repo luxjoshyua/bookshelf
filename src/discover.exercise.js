@@ -22,6 +22,7 @@ function DiscoverBooksScreen() {
   // useEffect makes the request with the client,
   // and updates the status and data
   // remember react calls the callback immediately, so add dependency list
+  const endpoint = `books?query=${encodeURIComponent(query)}`
   React.useEffect(() => {
     // if already queried, return early, because effect callbacks are called on
     // the initial render too
@@ -34,11 +35,11 @@ function DiscoverBooksScreen() {
     //   .then(response => response.json())
     //   .then(json => console.log(json))
 
-    client(`books?query=${encodeURIComponent(query)}`).then(responseData => {
+    client(endpoint).then(responseData => {
       setData(responseData)
       setStatus('success')
     })
-  }, [queried, query])
+  }, [endpoint, queried, query])
 
   function handleSearchSubmit(event) {
     event.preventDefault() // prevent full page reload
