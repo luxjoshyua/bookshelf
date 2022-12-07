@@ -2,6 +2,7 @@
 import {jsx} from '@emotion/core'
 import * as React from 'react'
 import './bootstrap'
+import {useAsync} from 'utils/hooks'
 import Tooltip from '@reach/tooltip'
 import {FaSearch} from 'react-icons/fa'
 import {Input, BookListUL, Spinner} from './components/lib'
@@ -10,17 +11,18 @@ import {client} from 'utils/api-client.exercise'
 import * as colors from 'styles/colors'
 
 function DiscoverBooksScreen() {
-  const [status, setStatus] = React.useState('idle')
+  const {status, data, error, run, isLoading, isError, isSuccess} = useAsync()
+  // const [status, setStatus] = React.useState('idle')
   const [query, setQuery] = React.useState('')
-  const [data, setData] = React.useState(null)
+  // const [data, setData] = React.useState(null)
   // don't want to run the search until user has submitted the form,
   // this boolean is for that
   const [queried, setQueried] = React.useState(false)
-  const [error, setError] = React.useState()
+  // const [error, setError] = React.useState()
 
-  const isLoading = status === 'loading'
-  const isSuccess = status === 'success'
-  const isError = status === 'error'
+  // const isLoading = status === 'loading'
+  // const isSuccess = status === 'success'
+  // const isError = status === 'error'
 
   // useEffect makes the request with the client,
   // and updates the status and data
@@ -32,19 +34,20 @@ function DiscoverBooksScreen() {
     if (!queried) {
       return
     }
-    setStatus('loading')
+    // setStatus('loading')
+    run(client(endpoint))
 
-    client(endpoint).then(
-      responseData => {
-        setData(responseData)
-        setStatus('success')
-      },
-      errorData => {
-        setError(errorData)
-        setStatus('error')
-      },
-    )
-  }, [endpoint, queried, query])
+    // client(endpoint).then(
+    //   responseData => {
+    //     setData(responseData)
+    //     setStatus('success')
+    //   },
+    //   errorData => {
+    //     setError(errorData)
+    //     setStatus('error')
+    //   },
+    // )
+  }, [endpoint, queried, query, run])
 
   function handleSearchSubmit(event) {
     event.preventDefault() // prevent full page reload
