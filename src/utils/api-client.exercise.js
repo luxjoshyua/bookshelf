@@ -8,7 +8,14 @@ async function client(endpoint, customConfig = {}) {
   // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
   let url = `${process.env.REACT_APP_API_URL}/${endpoint}` // full URL
   // call window,fetch(fullURL, config) then handle the JSON response
-  return window.fetch(url, config).then(response => response.json())
+  return window.fetch(url, config).then(async response => {
+    const data = await response.json()
+    if (response.ok) {
+      return data
+    } else {
+      return Promise.reject(data)
+    }
+  })
 }
 
 export {client}
