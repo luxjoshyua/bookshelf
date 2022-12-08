@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
+import * as colors from './styles/colors'
 import * as React from 'react'
 import './bootstrap'
 import Tooltip from '@reach/tooltip'
@@ -7,13 +8,17 @@ import {FaSearch} from 'react-icons/fa'
 import {Input, BookListUL, Spinner} from './components/lib'
 import {BookRow} from './components/book-row'
 import {client} from 'utils/api-client.exercise'
+import {useAsync} from 'utils/hooks'
 
 function DiscoverBooksScreen() {
   const [query, setQuery] = React.useState('')
   const [status, setStatus] = React.useState('idle') // idle, loading, success
-  const [data, setData] = React.useState(null)
+  // const [data, setData] = React.useState(null)
   // don't want to run the search until user has submitted form
   const [queried, setQueried] = React.useState(false)
+  // const [error, setError] = React.useState(null)
+
+  const {data, error, run, isLoading, isError, isSuccess} = useAsync()
 
   // makes the request with the client and updates the status and data
   React.useEffect(() => {
@@ -25,14 +30,24 @@ function DiscoverBooksScreen() {
 
     setStatus('loading')
 
-    client(`books?query=${encodeURIComponent(query)}`).then(responseData => {
-      setStatus('success')
-      setData(responseData)
-    })
+    run(client(`books?query=${encodeURIComponent(query)}`))
+
+    // client(`books?query=${encodeURIComponent(query)}`).then(
+    //   responseData => {
+    //     setStatus('success')
+    //     setData(responseData)
+    //   },
+    //   error => {
+    //     setStatus('error')
+    //     setError(error)
+    //     console.log(`error in useEffect: ${error}`)
+    //   },
+    // )
   }, [queried, query])
 
-  const isLoading = status === 'loading'
-  const isSuccess = status === 'success'
+  // const isLoading = status === 'loading'
+  // const isSuccess = status === 'success'
+  // const isError = status === 'error'
 
   function handleSearchSubmit(event) {
     event.preventDefault() // prevent full page reload
@@ -67,6 +82,13 @@ function DiscoverBooksScreen() {
           </label>
         </Tooltip>
       </form>
+
+      {isError ? (
+        <div css={{color: colors.danger}}>
+          <p>There was an error:</p>
+          <pre>{error.message}</pre>
+        </div>
+      ) : null}
 
       {isSuccess ? (
         data?.books?.length ? (
