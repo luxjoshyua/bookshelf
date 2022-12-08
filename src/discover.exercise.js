@@ -2,58 +2,43 @@
 import {jsx} from '@emotion/core'
 import * as React from 'react'
 import './bootstrap'
-import {useAsync} from 'utils/hooks'
 import Tooltip from '@reach/tooltip'
 import {FaSearch} from 'react-icons/fa'
 import {Input, BookListUL, Spinner} from './components/lib'
 import {BookRow} from './components/book-row'
 import {client} from 'utils/api-client.exercise'
-import * as colors from 'styles/colors'
 
 function DiscoverBooksScreen() {
-  const {status, data, error, run, isLoading, isError, isSuccess} = useAsync()
-  // const [status, setStatus] = React.useState('idle')
   const [query, setQuery] = React.useState('')
-  // const [data, setData] = React.useState(null)
-  // don't want to run the search until user has submitted the form,
-  // this boolean is for that
+  const [status, setStatus] = React.useState('idle') // idle, loading, success
+  const [data, setData] = React.useState(null)
+  // don't want to run the search until user has submitted form
   const [queried, setQueried] = React.useState(false)
-  // const [error, setError] = React.useState()
 
-  // const isLoading = status === 'loading'
-  // const isSuccess = status === 'success'
-  // const isError = status === 'error'
-
-  // useEffect makes the request with the client,
-  // and updates the status and data
-  // remember react calls the callback immediately, so add dependency list
-  const endpoint = `books?query=${encodeURIComponent(query)}`
+  // makes the request with the client and updates the status and data
   React.useEffect(() => {
-    // if already queried, return early, because effect callbacks are called on
-    // the initial render too
+    // if user has already submitted form, end early, because effect callbacks
+    // are called on the initial render too
     if (!queried) {
       return
     }
-    // setStatus('loading')
-    run(client(endpoint))
 
-    // client(endpoint).then(
-    //   responseData => {
-    //     setData(responseData)
-    //     setStatus('success')
-    //   },
-    //   errorData => {
-    //     setError(errorData)
-    //     setStatus('error')
-    //   },
-    // )
-  }, [endpoint, queried, query, run])
+    setStatus('loading')
+
+    client(`books?query=${encodeURIComponent(query)}`).then(responseData => {
+      setStatus('success')
+      setData(responseData)
+    })
+  }, [queried, query])
+
+  const isLoading = status === 'loading'
+  const isSuccess = status === 'success'
 
   function handleSearchSubmit(event) {
     event.preventDefault() // prevent full page reload
-    setQuery(event.target.elements.search.value) // set the query value
-    // console.log(event.target.elements.search.value)
-    setQueried(true)
+    setQueried(true) // set queried state to true
+    const searchValue = event.target.elements.search.value // set query value
+    setQuery(searchValue)
   }
 
   return (
@@ -82,13 +67,6 @@ function DiscoverBooksScreen() {
           </label>
         </Tooltip>
       </form>
-
-      {isError ? (
-        <div css={{color: colors.danger}}>
-          <p>There was an error:</p>
-          <pre>{error.message}</pre>
-        </div>
-      ) : null}
 
       {isSuccess ? (
         data?.books?.length ? (
