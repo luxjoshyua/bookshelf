@@ -13,12 +13,12 @@ import {useAsync} from 'utils/hooks'
 function DiscoverBooksScreen() {
   const [query, setQuery] = React.useState('')
   const [status, setStatus] = React.useState('idle') // idle, loading, success
-  // const [data, setData] = React.useState(null)
+  const [data, setData] = React.useState(null)
   // don't want to run the search until user has submitted form
   const [queried, setQueried] = React.useState(false)
-  // const [error, setError] = React.useState(null)
+  const [error, setError] = React.useState(null)
 
-  const {data, error, run, isLoading, isError, isSuccess} = useAsync()
+  // const {data, error, run, isLoading, isError, isSuccess} = useAsync()
 
   // makes the request with the client and updates the status and data
   React.useEffect(() => {
@@ -30,24 +30,24 @@ function DiscoverBooksScreen() {
 
     setStatus('loading')
 
-    run(client(`books?query=${encodeURIComponent(query)}`))
+    // run(client(`books?query=${encodeURIComponent(query)}`))
 
-    // client(`books?query=${encodeURIComponent(query)}`).then(
-    //   responseData => {
-    //     setStatus('success')
-    //     setData(responseData)
-    //   },
-    //   error => {
-    //     setStatus('error')
-    //     setError(error)
-    //     console.log(`error in useEffect: ${error}`)
-    //   },
-    // )
+    client(`books?query=${encodeURIComponent(query)}`).then(
+      responseData => {
+        setStatus('success')
+        setData(responseData)
+      },
+      error => {
+        setStatus('error')
+        setError(error)
+        console.log(`error in useEffect: ${error}`)
+      },
+    )
   }, [queried, query])
 
-  // const isLoading = status === 'loading'
-  // const isSuccess = status === 'success'
-  // const isError = status === 'error'
+  const isLoading = status === 'loading'
+  const isSuccess = status === 'success'
+  const isError = status === 'error'
 
   function handleSearchSubmit(event) {
     event.preventDefault() // prevent full page reload

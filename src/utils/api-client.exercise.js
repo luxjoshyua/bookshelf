@@ -9,9 +9,9 @@ async function client(endpoint, customConfig = {}) {
 
   // FIRST WORKING METHOD
   const url = `${process.env.REACT_APP_API_URL}/${endpoint}`
-  let response = await window.fetch(url, config)
+  const response = await window.fetch(url, config)
   if (response.ok) {
-    let returnedData = await response.json()
+    const returnedData = await response.json()
     return returnedData
   } else {
     throw new Error(`Didn't return data: ${response.status}`)
