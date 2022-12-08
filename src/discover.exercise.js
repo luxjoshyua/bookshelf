@@ -8,7 +8,7 @@ import {FaSearch} from 'react-icons/fa'
 import {Input, BookListUL, Spinner} from './components/lib'
 import {BookRow} from './components/book-row'
 import {client} from 'utils/api-client.exercise'
-import {useAsync} from 'utils/hooks'
+// import {useAsync} from 'utils/hooks'
 
 function DiscoverBooksScreen() {
   const [query, setQuery] = React.useState('')
