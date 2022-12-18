@@ -48,38 +48,47 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
 }
 
 function StatusButtons({user, book}) {
-  // 🐨 call useQuery here to get the listItem (if it exists)
-  // queryKey should be 'list-items'
-  // queryFn should call the list-items endpoint
+  // useQuery gets the listItem (if it exists)
+  // the queryKey is 'list-items'
+  // queryFn calls the list-items endpoint
+  // alias the data to listItems
+  const {data: listItems} = useQuery({
+    queryKey: 'list-items',
+    // authenticated request so need to pass the token
+    queryFn: () =>
+      // returns an object that has a list items property, we only want value, so go through and access that
+      client(`list-items`, {token: user.token}).then(data => data.listItems),
+  })
+  // search through the listItems we got from react-query and find the one with the right bookId
+  // check the listItems actually exist using elvis operator ? - if not, end there, don't throw error
+  // is async so at times listItems will not be defined
+  const listItem = listItems?.find(li => li.bookId === book.id) ?? null
 
-  const {data: listItems} = useQuery()
-
-  // 🐨 search through the listItems you got from react-query and find the
-  // one with the right bookId.
-  const listItem = null
-
-  // 💰 for all the mutations below, if you want to get the list-items cache
-  // updated after this query finishes then use the `onSettled` config option
-  // to queryCache.invalidateQueries('list-items')
-
-  // 🐨 call useMutation here and assign the mutate function to "update"
-  // the mutate function should call the list-items/:listItemId endpoint with a PUT
-  //   and the updates as data. The mutate function will be called with the updates
-  //   you can pass as data.
-  // always returns an array
-
-  // 🐨 call useMutation here and assign the mutate function to "remove"
-  // the mutate function should call the list-items/:listItemId endpoint with a DELETE
-  const [remove] = useMutation(
-    ({id}) => client(`list-items/${id}`, {method: 'DELETE', token: user.token}),
+  // mutate function calls the list-items/:listItemId endpoint with a PUT and the updates as data.
+  // the mutate function will be called with the updates we pass as data
+  const [update] = useMutation(
+    ({id}) =>
+      client(`list-items/${id}`, {
+        method: 'PUT',
+        data: {id},
+        token: user.token,
+      }),
+    // passing onSettled gets the list-items cache updated after this query finishes, regardless of whether the request succeeds or fails
     {onSettled: () => queryCache.invalidateQueries('list-items')},
   )
 
-  // 🐨 call useMutation here and assign the mutate function to "create"
-  // the mutate function should call the list-items endpoint with a POST
-  // and the bookId the listItem is being created for.
+  // mutate function calls the list-items/:listItemId endpoint with a DELETE
+  const [remove] = useMutation(
+    ({id}) => client(`list-items/${id}`, {method: 'DELETE', token: user.token}),
+    // passing onSettled gets the list-items cache updated after this query finishes, regardless of whether the request succeeds or fails
+    {onSettled: () => queryCache.invalidateQueries('list-items')},
+  )
+
+  // mutate function calls the list-items endpoint with a POST
+  // and the bookId the listItem is being created for
   const [create] = useMutation(
     ({bookId}) => client('list-items', {data: {bookId}, token: user.token}),
+    // passing onSettled gets the list-items cache updated after this query finishes, regardless of whether the request succeeds or fails
     {onSettled: () => queryCache.invalidateQueries('list-items')},
   )
 
@@ -90,18 +99,14 @@ function StatusButtons({user, book}) {
           <TooltipButton
             label="Unmark as read"
             highlight={colors.yellow}
-            // 🐨 add an onClick here that calls update with the data we want to update
-            // 💰 to mark a list item as unread, set the finishDate to null
-            // {id: listItem.id, finishDate: null}
+            onClick={() => update({id: listItem.id, finishDate: null})}
             icon={<FaBook />}
           />
         ) : (
           <TooltipButton
             label="Mark as read"
             highlight={colors.green}
-            // 🐨 add an onClick here that calls update with the data we want to update
-            // 💰 to mark a list item as read, set the finishDate
-            // {id: listItem.id, finishDate: Date.now()}
+            onClick={() => update({id: listItem.id, finishDate: Date.now()})}
             icon={<FaCheckCircle />}
           />
         )
