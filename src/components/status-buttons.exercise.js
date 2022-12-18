@@ -77,6 +77,18 @@ function StatusButtons({user, book}) {
     {onSettled: () => queryCache.invalidateQueries('list-items')},
   )
 
+  // update written differently
+  // const [update] = useMutation(
+  //   (updates) =>
+  //     client(`list-items/${updates.id}`, {
+  //       method: 'PUT',
+  //       data: {id},
+  //       token: user.token,
+  //     }),
+  //   // passing onSettled gets the list-items cache updated after this query finishes, regardless of whether the request succeeds or fails
+  //   {onSettled: () => queryCache.invalidateQueries('list-items')},
+  // )
+
   // mutate function calls the list-items/:listItemId endpoint with a DELETE
   const [remove] = useMutation(
     ({id}) => client(`list-items/${id}`, {method: 'DELETE', token: user.token}),
