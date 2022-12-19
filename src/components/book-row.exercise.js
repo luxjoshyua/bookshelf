@@ -12,16 +12,11 @@ import {Rating} from './rating'
 function BookRow({user, book}) {
   const {title, author, coverImageUrl} = book
 
-  // useQuery gets the list item
-  // queryKey: 'list-items'
-  // queryFn: call to the list-items endpoint
   const {data: listItems} = useQuery({
     queryKey: 'list-items',
     queryFn: () =>
       client(`list-items`, {token: user.token}).then(data => data.listItems),
   })
-
-  // assign listItem to the list item that has the same bookId as the book.id
   const listItem = listItems?.find(li => li.bookId === book.id) ?? null
 
   const id = `book-row-book-${book.id}`

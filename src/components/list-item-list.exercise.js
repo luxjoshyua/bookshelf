@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
+
 import {useQuery} from 'react-query'
 import {client} from 'utils/api-client'
 import {BookListUL} from './lib'
@@ -11,14 +12,11 @@ function ListItemList({
   noListItems,
   noFilteredListItems,
 }) {
-  // queryKey: 'list-items'
-  // queryFn: 'list-items' endpoint
   const {data: listItems} = useQuery({
     queryKey: 'list-items',
     queryFn: () =>
-      client('list-items', {token: user.token}).then(data => data.listItems),
+      client(`list-items`, {token: user.token}).then(data => data.listItems),
   })
-
   const filteredListItems = listItems?.filter(filterListItems)
 
   if (!listItems?.length) {

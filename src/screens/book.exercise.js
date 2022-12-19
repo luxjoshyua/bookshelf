@@ -7,7 +7,6 @@ import {FaRegCalendarAlt} from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
 import {useParams} from 'react-router-dom'
 import {useQuery, useMutation, queryCache} from 'react-query'
-// import {useAsync} from 'utils/hooks'
 import {client} from 'utils/api-client'
 import {formatDate} from 'utils/misc'
 import * as mq from 'styles/media-queries'
@@ -15,41 +14,26 @@ import * as colors from 'styles/colors'
 import {Textarea} from 'components/lib'
 import {Rating} from 'components/rating'
 import {StatusButtons} from 'components/status-buttons'
-import bookPlaceholderSvg from 'assets/book-placeholder.svg'
-
-const loadingBook = {
-  title: 'Loading...',
-  author: 'loading...',
-  coverImageUrl: bookPlaceholderSvg,
-  publisher: 'Loading Publishing',
-  synopsis: 'Loading...',
-  loadingBook: true,
-}
+// import bookPlaceholderSvg from 'assets/book-placeholder.svg'
+import {useBook} from 'utils/books.exercise'
 
 function BookScreen({user}) {
   const {bookId} = useParams()
+  // const {data: book = loadingBook} = useQuery({
+  //   queryKey: ['book', {bookId}],
+  //   queryFn: () =>
+  //     client(`books/${bookId}`, {token: user.token}).then(data => data.book),
+  // })
 
-  // queryKey: ['book', {bookId}]
-  // queryFn: client(`books/${bookId}`)
-  const {data: book = loadingBook} = useQuery({
-    queryKey: ['book', {bookId}],
-    queryFn: () =>
-      client(`books/${bookId}`, {token: user.token}).then(data => data.book),
-  })
+  // the bookId and the user are what we need everytime because it's what
+  // identifies that book as unique and also validates the request
+  const book = useBook(bookId, user)
 
-  // call useQuery to get the list item from the list-items endpoint
-  // queryKey is 'list-items'
-  // queryFn calls the 'list-items' endpoint with the user's token
   const {data: listItems} = useQuery({
     queryKey: 'list-items',
     queryFn: () =>
-      client('list-items', {token: user.token}).then(data => data.listItems),
+      client(`list-items`, {token: user.token}).then(data => data.listItems),
   })
-
-  // note that the backend doesn't support getting a single list-item by it's ID
-  // and instead expects us to cache all the list items and look them up in our
-  // cache. This works out because we're using react-query for caching.
-
   const listItem = listItems?.find(li => li.bookId === bookId) ?? null
 
   const {title, author, coverImageUrl, publisher, synopsis} = book
@@ -134,9 +118,6 @@ function ListItemTimeframe({listItem}) {
 }
 
 function NotesTextarea({listItem, user}) {
-  // calls the list-items/:listItemId endpoint with a PUT request
-  // and the updates as data.
-  // mutation function is called with the updates we pass as data
   const [mutate] = useMutation(
     updates =>
       client(`list-items/${updates.id}`, {
@@ -144,10 +125,8 @@ function NotesTextarea({listItem, user}) {
         data: updates,
         token: user.token,
       }),
-    // invalidate the list-items cache after this query finishes
     {onSettled: () => queryCache.invalidateQueries('list-items')},
   )
-
   const debouncedMutate = React.useMemo(
     () => debounceFn(mutate, {wait: 300}),
     [mutate],

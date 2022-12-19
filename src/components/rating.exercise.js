@@ -20,9 +20,6 @@ const visuallyHiddenCSS = {
 
 function Rating({listItem, user}) {
   const [isTabbing, setIsTabbing] = React.useState(false)
-
-  // mutate function calls the list-items/:listItemId endpoint with a PUT and the updates as data.
-  // the mutate function is called with the updates we pass as data
   const [update] = useMutation(
     updates =>
       client(`list-items/${updates.id}`, {
@@ -30,8 +27,6 @@ function Rating({listItem, user}) {
         data: updates,
         token: user.token,
       }),
-    // pass the `onSettled` config option to queryCache.invalidateQueries('list-items') in order
-    // to update the list-items cache after the query finishes
     {onSettled: () => queryCache.invalidateQueries('list-items')},
   )
 

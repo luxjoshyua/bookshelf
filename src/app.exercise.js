@@ -44,8 +44,8 @@ function App() {
   const register = form => auth.register(form).then(user => setData(user))
   const logout = () => {
     auth.logout()
+    queryCache.clear()
     setData(null)
-    queryCache.clear() // clear the queryCache
   }
 
   if (isLoading || isIdle) {
