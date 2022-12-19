@@ -62,6 +62,7 @@ function StatusButtons({user, book}) {
   // search through the listItems we got from react-query and find the one with the right bookId
   // check the listItems actually exist using elvis operator ? - if not, end there, don't throw error
   // is async so at times listItems will not be defined
+
   const listItem = listItems?.find(li => li.bookId === book.id) ?? null
 
   // mutate function calls the list-items/:listItemId endpoint with a PUT and the updates as data.

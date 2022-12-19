@@ -6,9 +6,8 @@ import debounceFn from 'debounce-fn'
 import {FaRegCalendarAlt} from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
 import {useParams} from 'react-router-dom'
-// 🐨 you'll need these:
-// import {useQuery, useMutation, queryCache} from 'react-query'
-import {useAsync} from 'utils/hooks'
+import {useQuery, useMutation, queryCache} from 'react-query'
+// import {useAsync} from 'utils/hooks'
 import {client} from 'utils/api-client'
 import {formatDate} from 'utils/misc'
 import * as mq from 'styles/media-queries'
@@ -29,27 +28,30 @@ const loadingBook = {
 
 function BookScreen({user}) {
   const {bookId} = useParams()
-  // 💣 remove the useAsync call here
-  const {data, run} = useAsync()
 
-  // 🐨 call useQuery here
-  // queryKey should be ['book', {bookId}]
-  // queryFn should be what's currently passed in the run function below
+  // queryKey: ['book', {bookId}]
+  // queryFn: client(`books/${bookId}`)
+  const {data: book = loadingBook} = useQuery({
+    queryKey: ['book', {bookId}],
+    queryFn: () =>
+      client(`books/${bookId}`, {token: user.token}).then(data => data.book),
+  })
 
-  // 💣 remove the useEffect here (react-query will handle that now)
-  React.useEffect(() => {
-    run(client(`books/${bookId}`, {token: user.token}))
-  }, [run, bookId, user.token])
+  // call useQuery to get the list item from the list-items endpoint
+  // queryKey is 'list-items'
+  // queryFn calls the 'list-items' endpoint with the user's token
+  const {data: listItems} = useQuery({
+    queryKey: 'list-items',
+    queryFn: () =>
+      client('list-items', {token: user.token}).then(data => data.listItems),
+  })
 
-  // 🐨 call useQuery to get the list item from the list-items endpoint
-  // queryKey should be 'list-items'
-  // queryFn should call the 'list-items' endpoint with the user's token
-  const listItem = null
-  // 🦉 NOTE: the backend doesn't support getting a single list-item by it's ID
+  // note that the backend doesn't support getting a single list-item by it's ID
   // and instead expects us to cache all the list items and look them up in our
-  // cache. This works out because we're using react-query for caching!
+  // cache. This works out because we're using react-query for caching.
 
-  const book = data?.book ?? loadingBook
+  const listItem = listItems?.find(li => li.bookId === bookId) ?? null
+
   const {title, author, coverImageUrl, publisher, synopsis} = book
 
   return (
@@ -132,15 +134,20 @@ function ListItemTimeframe({listItem}) {
 }
 
 function NotesTextarea({listItem, user}) {
-  // 🐨 call useMutation here
-  // the mutate function should call the list-items/:listItemId endpoint with a PUT
-  //   and the updates as data. The mutate function will be called with the updates
-  //   you can pass as data.
-  // 💰 if you want to get the list-items cache updated after this query finishes
-  // then use the `onSettled` config option to queryCache.invalidateQueries('list-items')
-  // 💣 DELETE THIS ESLINT IGNORE!! Don't ignore the exhaustive deps rule please
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const mutate = () => {}
+  // calls the list-items/:listItemId endpoint with a PUT request
+  // and the updates as data.
+  // mutation function is called with the updates we pass as data
+  const [mutate] = useMutation(
+    updates =>
+      client(`list-items/${updates.id}`, {
+        method: 'PUT',
+        data: updates,
+        token: user.token,
+      }),
+    // invalidate the list-items cache after this query finishes
+    {onSettled: () => queryCache.invalidateQueries('list-items')},
+  )
+
   const debouncedMutate = React.useMemo(
     () => debounceFn(mutate, {wait: 300}),
     [mutate],
