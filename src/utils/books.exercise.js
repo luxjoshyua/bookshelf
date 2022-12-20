@@ -35,7 +35,6 @@ function useBookSearch(query, user) {
       }).then(data => data.books),
   })
 
-  // do the encodeURI component one here
   return {...result, books: result.data ?? loadingBooks}
 }
 

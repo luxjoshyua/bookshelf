@@ -2,8 +2,7 @@
 import {jsx} from '@emotion/core'
 
 import * as React from 'react'
-import {useMutation, queryCache} from 'react-query'
-import {client} from 'utils/api-client'
+import {useUpdateListItem} from 'utils/list-items'
 import {FaStar} from 'react-icons/fa'
 import * as colors from 'styles/colors'
 
@@ -20,15 +19,7 @@ const visuallyHiddenCSS = {
 
 function Rating({listItem, user}) {
   const [isTabbing, setIsTabbing] = React.useState(false)
-  const [update] = useMutation(
-    updates =>
-      client(`list-items/${updates.id}`, {
-        method: 'PUT',
-        data: updates,
-        token: user.token,
-      }),
-    {onSettled: () => queryCache.invalidateQueries('list-items')},
-  )
+  const [update] = useUpdateListItem(user)
 
   React.useEffect(() => {
     function handleKeyDown(event) {
@@ -61,10 +52,6 @@ function Rating({listItem, user}) {
             {
               [`.${rootClassName} &:checked ~ label`]: {color: colors.gray20},
               [`.${rootClassName} &:checked + label`]: {color: 'orange'},
-              // !important is here because we're doing special non-css-in-js things
-              // and so we have to deal with specificity and cascade. But, I promise
-              // this is better than trying to make this work with JavaScript.
-              // So deal with it 😎
               [`.${rootClassName} &:hover ~ label`]: {
                 color: `${colors.gray20} !important`,
               },
