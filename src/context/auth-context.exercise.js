@@ -32,6 +32,21 @@ async function getUser() {
   return user
 }
 
+// hook that gives us an authenticated client
+function useClient(endpoint, config) {
+  // endpoint e.g. `books?query=${encodeURIComponent(query)}`
+  // config e.g. {token: user.token}
+  const {
+    user: {token},
+  } = useAuth()
+  // returns a memoized authenticated client
+  // so we don't have to compute the user each time on render. only if user changes
+  return React.useCallback(
+    (endpoint, config) => client(endpoint, {...config, token}),
+    [token],
+  )
+}
+
 // component that renders our AuthContext
 function AuthProvider(props) {
   const {
@@ -71,4 +86,4 @@ function AuthProvider(props) {
   }
 }
 
-export {AuthProvider, useAuth}
+export {useAuth, useClient, AuthProvider}
