@@ -10,9 +10,6 @@ import {
   Spinner,
   FormGroup,
   ErrorMessage,
-  // 💣 when you're all done, you won't need this Dialog anymore
-  // you can remove this now or later when you've finished
-  Dialog,
 } from './components/lib'
 import {
   Modal,

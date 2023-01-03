@@ -30,7 +30,6 @@ const ModalContext = React.createContext()
  *  - renders the ModalContext.Provider with the value which will pass the isOpen state and setIsOpen function
  */
 function Modal(props) {
-  console.log(`props in Modal: ${props}`)
   const [isOpen, setIsOpen] = React.useState(false)
   const value = [isOpen, setIsOpen]
   // don't forget to spread the props, otherwise whole thing breaks!
@@ -50,7 +49,8 @@ function ModalDismissButton({children: child}) {
   const [, setIsOpen] = React.useContext(ModalContext)
   // child (the button) is the element we want to clone/copy
   return React.cloneElement(child, {
-    onClick: () => setIsOpen(false),
+    // onClick: () => setIsOpen(false),
+    onClick: callAll(() => setIsOpen(false), child.props.onClick),
   })
 }
 
@@ -60,11 +60,38 @@ function ModalDismissButton({children: child}) {
  */
 function ModalOpenButton({children: child}) {
   const [, setIsOpen] = React.useContext(ModalContext)
+
   // child (the button) is the element we want to clone, second arg are the props, third arg (not passed) is the children e.g. 'Button Text'
+  // return React.cloneElement(child, {
+  //   // need to return more than one thing here
+  //   onClick: () => setIsOpen(true),
+  // })
+
   return React.cloneElement(child, {
-    onClick: () => setIsOpen(true),
+    // prefer this syntax than the below
+    // onClick: () => {
+    //   setIsOpen(true)
+    //   console.log('something else happening')
+    // },
+    onClick: callAll(() => setIsOpen(true), child.props.onClick),
+    // onClick: (...args) => {
+    //   setIsOpen(true)
+    //   if (child.props.onClick) {
+    //     child.props.onClick(...args)
+    //   }
+    // },
   })
 }
+
+// ref: https://stackoverflow.com/questions/68862702/react-onclick-callall-functions-syntax
+const callAll =
+  // any number of functions
+
+    (...fns) =>
+    // return a function that accepts any number of arguments
+    (...args) =>
+      // when these functions are called, for each function, if it exists, call with the args passed
+      fns.forEach(fn => fn && fn(...args))
 
 /**
  * ModalContents component
@@ -75,7 +102,6 @@ function ModalOpenButton({children: child}) {
  */
 function ModalContents(props) {
   const {children} = props
-  console.log(`props in ModalContents: ${props}`)
   const [isOpen, setIsOpen] = React.useContext(ModalContext)
   return (
     <Dialog isOpen={isOpen} onDismiss={() => setIsOpen(false)} {...props}>
