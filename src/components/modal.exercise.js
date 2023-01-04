@@ -139,16 +139,12 @@ const CircleDismissButton = () => (
  *  - renders the h3 title
  */
 function ModalContents({title, children, ...props}) {
-  // const [isOpen, setIsOpen] = React.useContext(ModalContext)
   return (
     <ModalContentsBase {...props}>
       <CircleDismissButton />
       <h3 css={{textAlign: 'center', fontSize: '2em'}}>{title}</h3>
       {children}
     </ModalContentsBase>
-    // <Dialog isOpen={isOpen} onDismiss={() => setIsOpen(false)} {...props}>
-    //   {children}
-    // </Dialog>
   )
 }
 
