@@ -110,7 +110,7 @@ function NavLink(props) {
   )
 }
 
-function Nav(params) {
+function Nav() {
   return (
     <nav
       css={{
@@ -157,8 +157,9 @@ function AppRoutes() {
   )
 }
 
-// 🐨 change this to a default export
-export {AuthenticatedApp}
+// React.lazy expects the module we're importing to export
+// a React component as the default export, so we update this to default
+export default AuthenticatedApp
 
 // 🐨 Unfortunately, to make this work for our workshop,
 // you need to add this to src/authenticated-app.js:
