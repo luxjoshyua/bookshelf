@@ -40,12 +40,27 @@ function AuthProvider(props) {
     run(userPromise)
   }, [run])
 
-  const login = form => auth.login(form).then(user => setData(user))
-  const register = form => auth.register(form).then(user => setData(user))
-  const logout = () => {
+  const login = React.useCallback(
+    form => auth.login(form).then(user => setData(user)),
+    [setData],
+  )
+  const register = React.useCallback(
+    form => auth.register(form).then(user => setData(user)),
+    [setData],
+  )
+  const logout = React.useCallback(() => {
     auth.logout()
     setData(null)
-  }
+  }, [setData])
+
+  // create the object inside useMemo
+  // only rerender when the user changes, because that's the only managed state in the component that changes
+  // ref: https://www.makeuseof.com/javascript-react-memoization/
+  // is actually unnecessary here because the value doesn't change
+  const value = React.useMemo(
+    () => ({user, login, register, logout}),
+    [login, logout, register, user],
+  )
 
   if (isLoading || isIdle) {
     return <FullPageSpinner />
@@ -56,7 +71,6 @@ function AuthProvider(props) {
   }
 
   if (isSuccess) {
-    const value = {user, login, register, logout}
     return <AuthContext.Provider value={value} {...props} />
   }
 
