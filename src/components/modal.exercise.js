@@ -1,7 +1,10 @@
+/** @jsx jsx */
+import {jsx} from '@emotion/core'
 // Dialog component is a light wrapper around ReachUI Dialog
 // https://reach.tech/dialog/
-import {Dialog} from './lib'
+import {Dialog, CircleButton} from './lib'
 import React from 'react'
+import VisuallyHidden from '@reach/visually-hidden'
 
 // how the components will be used
 /*
@@ -87,6 +90,7 @@ function ModalOpenButton({children: child}) {
 const callAll =
   // any number of functions
 
+
     (...fns) =>
     // return a function that accepts any number of arguments
     (...args) =>
@@ -94,19 +98,57 @@ const callAll =
       fns.forEach(fn => fn && fn(...args))
 
 /**
- * ModalContents component
+ * ModalContentsBase component
  *  - renders the Dialog component
  *  - set the isOpen prop
  *  - set onDismiss prop which sets isOpen to close
  *  - forward along the rest of the props (especially children)
  */
-function ModalContents(props) {
-  const {children} = props
+function ModalContentsBase({children, ...props}) {
   const [isOpen, setIsOpen] = React.useContext(ModalContext)
   return (
-    <Dialog isOpen={isOpen} onDismiss={() => setIsOpen(false)} {...props}>
+    <Dialog
+      isOpen={isOpen}
+      onDismiss={() => setIsOpen(false)}
+      {...props}
+      aria-label="modal"
+    >
       {children}
     </Dialog>
+  )
+}
+
+const CircleDismissButton = () => (
+  <div css={{display: 'flex', justifyContent: 'flex-end'}}>
+    <ModalDismissButton>
+      <CircleButton>
+        <VisuallyHidden>Close</VisuallyHidden>
+        <span aria-hidden>×</span>
+      </CircleButton>
+    </ModalDismissButton>
+  </div>
+)
+
+/**
+ * ModalContents component
+ *  - renders the Dialog component
+ *  - set the isOpen prop
+ *  - set onDismiss prop which sets isOpen to close
+ *  - forward along the rest of the props (especially children)
+ *  - renders the circle dismiss button
+ *  - renders the h3 title
+ */
+function ModalContents({title, children, ...props}) {
+  // const [isOpen, setIsOpen] = React.useContext(ModalContext)
+  return (
+    <ModalContentsBase {...props}>
+      <CircleDismissButton />
+      <h3 css={{textAlign: 'center', fontSize: '2em'}}>{title}</h3>
+      {children}
+    </ModalContentsBase>
+    // <Dialog isOpen={isOpen} onDismiss={() => setIsOpen(false)} {...props}>
+    //   {children}
+    // </Dialog>
   )
 }
 
