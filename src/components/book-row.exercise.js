@@ -30,7 +30,7 @@ function BookRow({user, book}) {
           flexGrow: 2,
           display: 'grid',
           gridTemplateColumns: '140px 1fr',
-          gridGap: 20,
+          gridGap: 30,
           border: `1px solid ${colors.gray20}`,
           color: colors.text,
           padding: '1.25em',
