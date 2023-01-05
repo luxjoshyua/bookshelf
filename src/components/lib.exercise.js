@@ -9,7 +9,7 @@ import * as colors from 'styles/colors'
 
 const Button = styled.div(props => {
   return {
-    padding: '10px 15px',
+    padding: '10px 20px',
     border: '0',
     lineHeight: '1',
     borderRadius: '3px',
