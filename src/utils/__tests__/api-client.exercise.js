@@ -1,29 +1,33 @@
-// 🐨 you'll need the test server
-// 💰 the way that our tests are set up, you'll find this in `src/test/server/test-server.js`
-// import {server, rest} from 'test/server'
-// 🐨 grab the client
-// import {client} from '../api-client'
+import {server, rest} from 'test/server'
+// grab the client
+import {client} from '../api-client'
+import {setupServer} from 'msw/lib/node'
 
-// 🐨 add a beforeAll to start the server with `server.listen()`
-// 🐨 add an afterAll to stop the server when `server.close()`
-// 🐨 afterEach test, reset the server handlers to their original handlers
-// via `server.resetHandlers()`
+const apiURL = process.env.REACT_APP_API_URL
 
-// 🐨 flesh these out:
+// beforeAll, start the server
+beforeAll(() => server.listen())
 
-test.todo('calls fetch at the endpoint with the arguments for GET requests')
-// 🐨 add a server handler to handle a test request you'll be making
-// 💰 because this is the first one, I'll give you the code for how to do that.
-// const endpoint = 'test-endpoint'
-// const mockResult = {mockValue: 'VALUE'}
-// server.use(
-//   rest.get(`${apiURL}/${endpoint}`, async (req, res, ctx) => {
-//     return res(ctx.json(mockResult))
-//   }),
-// )
-//
-// 🐨 call the client (don't forget that it's asynchronous)
-// 🐨 assert that the resolved value from the client call is correct
+// afterAll, stop the server
+afterAll(() => server.close())
+
+// afterEach, reset the server handlers to their original handlers
+afterEach(() => server.resetHandlers())
+
+test('calls fetch at the endpoint with the arguments for GET requests', async () => {
+  // add a server handler to handle a test request we'll be making
+  const endpoint = 'test-endpoint'
+  const mockResult = {mockValue: 'TEST VALUE'}
+  server.use(
+    rest.get(`${apiURL}/${endpoint}`, async (req, res, ctx) => {
+      return res(ctx.json(mockResult))
+    }),
+  )
+  // call the client (remember it's asynchronous)
+  const result = await client(endpoint)
+  // assert that the resolved value from the client call is correct
+  expect(result).toEqual(mockResult)
+})
 
 test.todo('adds auth token when a token is provided')
 // 🐨 create a fake token (it can be set to any string you want)
