@@ -1,6 +1,6 @@
 import {server, rest} from 'test/server'
 // grab the client
-import {client} from '../api-client'
+import {client} from '../api-client' // client is async so all our functions need to be async
 import {setupServer} from 'msw/lib/node'
 
 const apiURL = process.env.REACT_APP_API_URL
@@ -11,7 +11,7 @@ beforeAll(() => server.listen())
 // afterAll, stop the server
 afterAll(() => server.close())
 
-// afterEach, reset the server handlers to their original handlers
+// afterEach test, reset the server handlers to their original handlers so between each test, we reset the server handlers
 afterEach(() => server.resetHandlers())
 
 test('calls fetch at the endpoint with the arguments for GET requests', async () => {
@@ -29,19 +29,29 @@ test('calls fetch at the endpoint with the arguments for GET requests', async ()
   expect(result).toEqual(mockResult)
 })
 
-test.todo('adds auth token when a token is provided')
-// 🐨 create a fake token (it can be set to any string you want)
-// 🐨 create a "request" variable with let
-// 🐨 create a server handler to handle a test request you'll be making
-// 🐨 inside the server handler, assign "request" to "req" so we can use that
-//     to assert things later.
-//     💰 so, something like...
-//       async (req, res, ctx) => {
-//         request = req
-//         ... etc...
-//
-// 🐨 call the client with the token (note that it's async)
-// 🐨 verify that `request.headers.get('Authorization')` is correct (it should include the token)
+test('adds auth token when a token is provided', async () => {
+  // create a fake token - can be any string we want
+  const token = 'abc123'
+  // create a request variable with let
+  let request
+
+  // create a server handler to handle test request
+  const endpoint = 'test-endpoint'
+  const mockResult = {mockValue: 'TEST VALUE'}
+  server.use(
+    rest.get(`${apiURL}/${endpoint}`, async (req, res, ctx) => {
+      // assign request to req so we can use that to assert things later
+      request = req
+      return res(ctx.json(mockResult))
+    }),
+  )
+
+  // call the client with the token (remember it's asynchronous)
+  await client(endpoint, {token})
+
+  // verify that `request.headers.get('Authorisation')` is correct (it should include the token)
+  expect(request.headers.get('Authorization')).toBe(`Bearer ${token}`)
+})
 
 test.todo('allows for config overrides')
 // 🐨 do a very similar setup to the previous test
