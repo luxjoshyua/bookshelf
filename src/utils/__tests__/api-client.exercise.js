@@ -111,3 +111,21 @@ test('when data is provided, it is stringified and the method defaults to POST',
   // verify the request.body is equal to the mock data object just passed
   expect(request.body).toEqual(data)
 })
+
+test('correctly rejects the promise if there is an error', async () => {
+  const testErrorMessage = {
+    message: 'Test error message',
+  }
+
+  // create a server handler to handle test request
+  const endpoint = 'test-endpoint'
+  server.use(
+    rest.get(`${apiURL}/${endpoint}`, async (req, res, ctx) => {
+      return res(ctx.status(400), ctx.json(testErrorMessage))
+    }),
+  )
+
+  // the response.ok is now false because the status is outside 200-299. so check the promise is rejected
+  // with the data returned from the server
+  await expect(client(endpoint)).rejects.toEqual(testErrorMessage)
+})
