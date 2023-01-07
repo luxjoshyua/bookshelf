@@ -1,7 +1,6 @@
 import {server, rest} from 'test/server'
 // grab the client
 import {client} from '../api-client' // client is async so all our functions need to be async
-import {setupServer} from 'msw/lib/node'
 
 const apiURL = process.env.REACT_APP_API_URL
 
@@ -77,7 +76,7 @@ test('allows for config overrides', async () => {
   )
 
   // call the client with the endpoint and the custom config
-  await client(endpoint, customConfig) // spread the custom config in, otherwise won't work !!!!!
+  await client(endpoint, customConfig)
 
   // console.dir(headers)
   // verify the request had the correct properties
@@ -86,12 +85,29 @@ test('allows for config overrides', async () => {
   )
 })
 
-test.todo(
-  'when data is provided, it is stringified and the method defaults to POST',
-)
-// 🐨 create a mock data object
-// 🐨 create a server handler very similar to the previous ones to handle the post request
-//    💰 Use rest.post instead of rest.get like we've been doing so far
-// 🐨 call client with an endpoint and an object with the data
-//    💰 client(endpoint, {data})
-// 🐨 verify the request.body is equal to the mock data object you passed
+test('when data is provided, it is stringified and the method defaults to POST', async () => {
+  // create a mock data object
+  const data = {
+    firstName: 'Sam',
+    address: 'Collaroy',
+  }
+  let request
+  const endpoint = 'test-endpoint'
+
+  // create a server handler very similar to the previous ones to handle the post request,
+  // except it's rest.post insead of rest.get
+  // useful ref: https://blog.openreplay.com/mocking-api-servers-with-mock-service-worker-msw/
+  server.use(
+    rest.post(`${apiURL}/${endpoint}`, async (req, res, ctx) => {
+      request = req
+      // return res(ctx.json({message: data}))
+      return res(ctx.json(req.body))
+    }),
+  )
+
+  // call client an endpoint and an object with the data
+  await client(endpoint, {data})
+
+  // verify the request.body is equal to the mock data object just passed
+  expect(request.body).toEqual(data)
+})
