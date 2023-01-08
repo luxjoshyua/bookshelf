@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import * as React from 'react'
-import {createRoot} from 'react-dom/client'
-import {Logo} from 'components/logo'
-import {Dialog} from '@reach/dialog'
-import '@reach/dialog/styles.css'
-
-function LoginForm({onSubmit, buttonText}) {
-=======
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
 import * as React from 'react'
@@ -18,7 +9,6 @@ import {Modal, ModalContents, ModalOpenButton} from './components/modal'
 import {Logo} from './components/logo'
 
 function LoginForm({onSubmit, submitButton}) {
->>>>>>> ef80adb8ec75d25a42e6caf4065c62d0c4360881
   function handleSubmit(event) {
     event.preventDefault()
     const {username, password} = event.target.elements
@@ -30,19 +20,6 @@ function LoginForm({onSubmit, submitButton}) {
   }
 
   return (
-<<<<<<< HEAD
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="username">Username</label>
-        <input id="username" />
-      </div>
-      <div>
-        <label htmlFor="password">Password</label>
-        <input id="password" type="password" />
-      </div>
-      <div>
-        <button type="submit">{buttonText}</button>
-=======
     <form
       onSubmit={handleSubmit}
       css={{
@@ -76,18 +53,12 @@ function LoginForm({onSubmit, submitButton}) {
             marginLeft: '5px',
           }}
         />
->>>>>>> ef80adb8ec75d25a42e6caf4065c62d0c4360881
       </div>
     </form>
   )
 }
 
 function App() {
-<<<<<<< HEAD
-  const [openModal, setOpenModal] = React.useState('none')
-
-=======
->>>>>>> ef80adb8ec75d25a42e6caf4065c62d0c4360881
   function login(formData) {
     console.log('login', formData)
   }
@@ -97,31 +68,6 @@ function App() {
   }
 
   return (
-<<<<<<< HEAD
-    <div>
-      <Logo width="80" height="80" />
-      <h1>Bookshelf</h1>
-      <div>
-        <button onClick={() => setOpenModal('login')}>Login</button>
-      </div>
-      <div>
-        <button onClick={() => setOpenModal('register')}>Register</button>
-      </div>
-      <Dialog aria-label="Login form" isOpen={openModal === 'login'}>
-        <div>
-          <button onClick={() => setOpenModal('none')}>Close</button>
-        </div>
-        <h3>Login</h3>
-        <LoginForm onSubmit={login} buttonText="Login" />
-      </Dialog>
-      <Dialog aria-label="Registration form" isOpen={openModal === 'register'}>
-        <div>
-          <button onClick={() => setOpenModal('none')}>Close</button>
-        </div>
-        <h3>Register</h3>
-        <LoginForm onSubmit={register} buttonText="Register" />
-      </Dialog>
-=======
     <div
       css={{
         display: 'flex',
@@ -176,7 +122,6 @@ function App() {
           </ModalContents>
         </Modal>
       </div>
->>>>>>> ef80adb8ec75d25a42e6caf4065c62d0c4360881
     </div>
   )
 }
