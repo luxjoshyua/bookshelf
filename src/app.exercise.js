@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
+<<<<<<< HEAD
 
 import * as React from 'react'
 import * as auth from 'auth-provider'
@@ -80,6 +81,16 @@ function App() {
       <UnauthenticatedApp {...props} />
     )
   }
+=======
+import {useAuth} from './context/auth-context'
+import {AuthenticatedApp} from './authenticated-app'
+import {UnauthenticatedApp} from './unauthenticated-app'
+
+function App() {
+  const {user} = useAuth()
+
+  return user ? <AuthenticatedApp /> : <UnauthenticatedApp />
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 }
 
 export {App}

@@ -1,10 +1,6 @@
-<<<<<<< HEAD
-import {useQuery} from 'react-query'
-=======
 import * as React from 'react'
 import {useQuery, queryCache} from 'react-query'
-import {useAuth} from 'context/auth-context'
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
+import {AuthContext} from 'context/auth-context'
 import {client} from './api-client'
 import bookPlaceholderSvg from 'assets/book-placeholder.svg'
 
@@ -22,20 +18,6 @@ const loadingBooks = Array.from({length: 10}, (v, index) => ({
   ...loadingBook,
 }))
 
-<<<<<<< HEAD
-function useBookSearch(query, user) {
-  const result = useQuery({
-    queryKey: ['bookSearch', {query}],
-    queryFn: () =>
-      client(`books?query=${encodeURIComponent(query)}`, {
-        token: user.token,
-      }).then(data => data.books),
-  })
-  return {...result, books: result.data ?? loadingBooks}
-}
-
-function useBook(bookId, user) {
-=======
 const getBookSearchConfig = (query, user) => ({
   queryKey: ['bookSearch', {query}],
   queryFn: () =>
@@ -52,14 +34,13 @@ const getBookSearchConfig = (query, user) => ({
 })
 
 function useBookSearch(query) {
-  const {user} = useAuth()
+  const {user} = React.useContext(AuthContext)
   const result = useQuery(getBookSearchConfig(query, user))
   return {...result, books: result.data ?? loadingBooks}
 }
 
 function useBook(bookId) {
-  const {user} = useAuth()
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
+  const {user} = React.useContext(AuthContext)
   const {data} = useQuery({
     queryKey: ['book', {bookId}],
     queryFn: () =>
@@ -68,11 +49,8 @@ function useBook(bookId) {
   return data ?? loadingBook
 }
 
-<<<<<<< HEAD
-export {useBook, useBookSearch}
-=======
 function useRefetchBookSearchQuery() {
-  const {user} = useAuth()
+  const {user} = React.useContext(AuthContext)
   return React.useCallback(
     async function refetchBookSearchQuery() {
       queryCache.removeQueries('bookSearch')
@@ -92,4 +70,3 @@ function setQueryDataForBook(book) {
 }
 
 export {useBook, useBookSearch, useRefetchBookSearchQuery, setQueryDataForBook}
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3

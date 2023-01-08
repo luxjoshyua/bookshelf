@@ -10,10 +10,21 @@ import {
   FaTimesCircle,
 } from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
+<<<<<<< HEAD
 import {useQuery, useMutation, queryCache} from 'react-query'
 import {client} from 'utils/api-client'
 import {useAsync} from 'utils/hooks'
 import * as colors from 'styles/colors'
+=======
+import {
+  useListItem,
+  useUpdateListItem,
+  useCreateListItem,
+  useRemoveListItem,
+} from 'utils/list-items'
+import * as colors from 'styles/colors'
+import {useAsync} from 'utils/hooks'
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 import {CircleButton, Spinner} from './lib'
 
 function TooltipButton({label, highlight, onClick, icon, ...rest}) {
@@ -47,6 +58,7 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
   )
 }
 
+<<<<<<< HEAD
 function StatusButtons({user, book}) {
   const {data: listItems} = useQuery({
     queryKey: 'list-items',
@@ -74,6 +86,13 @@ function StatusButtons({user, book}) {
     ({bookId}) => client(`list-items`, {data: {bookId}, token: user.token}),
     {onSettled: () => queryCache.invalidateQueries('list-items')},
   )
+=======
+function StatusButtons({book}) {
+  const listItem = useListItem(book.id)
+  const [update] = useUpdateListItem({throwOnError: true})
+  const [remove] = useRemoveListItem({throwOnError: true})
+  const [create] = useCreateListItem({throwOnError: true})
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 
   return (
     <React.Fragment>

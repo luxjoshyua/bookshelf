@@ -18,9 +18,15 @@ const visuallyHiddenCSS = {
   width: '1px',
 }
 
+<<<<<<< HEAD
 function Rating({listItem, user}) {
   const [isTabbing, setIsTabbing] = React.useState(false)
   const [update, {error, isError}] = useUpdateListItem(user)
+=======
+function Rating({listItem}) {
+  const [isTabbing, setIsTabbing] = React.useState(false)
+  const [update, {error, isError}] = useUpdateListItem()
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 
   React.useEffect(() => {
     function handleKeyDown(event) {
@@ -53,6 +59,13 @@ function Rating({listItem, user}) {
             {
               [`.${rootClassName} &:checked ~ label`]: {color: colors.gray20},
               [`.${rootClassName} &:checked + label`]: {color: 'orange'},
+<<<<<<< HEAD
+=======
+              // !important is here because we're doing special non-css-in-js things
+              // and so we have to deal with specificity and cascade. But, I promise
+              // this is better than trying to make this work with JavaScript.
+              // So deal with it 😎
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
               [`.${rootClassName} &:hover ~ label`]: {
                 color: `${colors.gray20} !important`,
               },

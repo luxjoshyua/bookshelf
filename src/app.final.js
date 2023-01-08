@@ -2,13 +2,23 @@
 import {jsx} from '@emotion/core'
 
 import * as React from 'react'
+<<<<<<< HEAD
 import * as auth from 'auth-provider'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {queryCache} from 'react-query'
+=======
+import {queryCache} from 'react-query'
+import * as auth from 'auth-provider'
+import {BrowserRouter as Router} from 'react-router-dom'
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 import {FullPageSpinner} from './components/lib'
 import * as colors from './styles/colors'
 import {client} from './utils/api-client'
 import {useAsync} from './utils/hooks'
+<<<<<<< HEAD
+=======
+import {AuthContext} from './context/auth-context'
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 import {AuthenticatedApp} from './authenticated-app'
 import {UnauthenticatedApp} from './unauthenticated-app'
 
@@ -72,12 +82,25 @@ function App() {
 
   if (isSuccess) {
     const props = {user, login, register, logout}
+<<<<<<< HEAD
     return user ? (
       <Router>
         <AuthenticatedApp {...props} />
       </Router>
     ) : (
       <UnauthenticatedApp {...props} />
+=======
+    return (
+      <AuthContext.Provider value={props}>
+        {user ? (
+          <Router>
+            <AuthenticatedApp />
+          </Router>
+        ) : (
+          <UnauthenticatedApp />
+        )}
+      </AuthContext.Provider>
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
     )
   }
 }

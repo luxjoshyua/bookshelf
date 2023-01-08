@@ -2,13 +2,18 @@
 import {jsx} from '@emotion/core'
 
 import {Link} from 'react-router-dom'
+<<<<<<< HEAD
 import {useQuery} from 'react-query'
 import {client} from 'utils/api-client'
+=======
+import {useListItem} from 'utils/list-items'
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 import * as mq from 'styles/media-queries'
 import * as colors from 'styles/colors'
 import {StatusButtons} from './status-buttons'
 import {Rating} from './rating'
 
+<<<<<<< HEAD
 function BookRow({user, book}) {
   const {title, author, coverImageUrl} = book
 
@@ -18,6 +23,12 @@ function BookRow({user, book}) {
       client(`list-items`, {token: user.token}).then(data => data.listItems),
   })
   const listItem = listItems?.find(li => li.bookId === book.id) ?? null
+=======
+function BookRow({book}) {
+  const {title, author, coverImageUrl} = book
+
+  const listItem = useListItem(book.id)
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 
   const id = `book-row-book-${book.id}`
 
@@ -77,9 +88,13 @@ function BookRow({user, book}) {
               >
                 {title}
               </h2>
+<<<<<<< HEAD
               {listItem?.finishDate ? (
                 <Rating user={user} listItem={listItem} />
               ) : null}
+=======
+              {listItem?.finishDate ? <Rating listItem={listItem} /> : null}
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
             </div>
             <div css={{marginLeft: 10}}>
               <div
@@ -111,7 +126,11 @@ function BookRow({user, book}) {
           height: '100%',
         }}
       >
+<<<<<<< HEAD
         <StatusButtons user={user} book={book} />
+=======
+        <StatusButtons book={book} />
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
       </div>
     </div>
   )

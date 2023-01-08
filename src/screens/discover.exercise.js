@@ -4,11 +4,16 @@ import {jsx} from '@emotion/core'
 import * as React from 'react'
 import Tooltip from '@reach/tooltip'
 import {FaSearch, FaTimes} from 'react-icons/fa'
+<<<<<<< HEAD
 import {useBookSearch, refetchBookSearchQuery} from 'utils/books.exercise'
+=======
+import {useBookSearch, useRefetchBookSearchQuery} from 'utils/books'
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 import * as colors from 'styles/colors'
 import {BookRow} from 'components/book-row'
 import {BookListUL, Spinner, Input} from 'components/lib'
 
+<<<<<<< HEAD
 function DiscoverBooksScreen({user}) {
   const [query, setQuery] = React.useState('')
   const [queried, setQueried] = React.useState(false)
@@ -22,6 +27,23 @@ function DiscoverBooksScreen({user}) {
     // run cleanup on the search cache so we refresh the book search query
     return () => refetchBookSearchQuery(user)
   }, [user])
+=======
+function DiscoverBooksScreen() {
+  const [query, setQuery] = React.useState('')
+  const [queried, setQueried] = React.useState(false)
+  const {books, error, status} = useBookSearch(query)
+
+  // refetchBookSearchQuery handles accessing the user
+  const refetchBookSearchQuery = useRefetchBookSearchQuery()
+
+  React.useEffect(() => {
+    return () => refetchBookSearchQuery()
+  }, [refetchBookSearchQuery])
+
+  const isLoading = status === 'loading'
+  const isSuccess = status === 'success'
+  const isError = status === 'error'
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 
   function handleSearchSubmit(event) {
     event.preventDefault()
@@ -90,7 +112,11 @@ function DiscoverBooksScreen({user}) {
           <BookListUL css={{marginTop: 20}}>
             {books.map(book => (
               <li key={book.id} aria-label={book.title}>
+<<<<<<< HEAD
                 <BookRow user={user} key={book.id} book={book} />
+=======
+                <BookRow key={book.id} book={book} />
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
               </li>
             ))}
           </BookListUL>

@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
+<<<<<<< HEAD
 
 import * as React from 'react'
 import {Routes, Route, Link, useMatch} from 'react-router-dom'
@@ -13,6 +14,41 @@ import {NotFoundScreen} from 'screens/not-found'
 function AuthenticatedApp({user, logout}) {
   return (
     <React.Fragment>
+=======
+import {Routes, Route, Link as RouterLink, useMatch} from 'react-router-dom'
+import {ErrorBoundary} from 'react-error-boundary'
+import {Button, ErrorMessage, FullPageErrorFallback} from './components/lib'
+import * as mq from './styles/media-queries'
+import * as colors from './styles/colors'
+import {useAuth} from './context/auth-context'
+import {ReadingListScreen} from './screens/reading-list'
+import {FinishedScreen} from './screens/finished'
+import {DiscoverBooksScreen} from './screens/discover'
+import {BookScreen} from './screens/book'
+import {NotFoundScreen} from './screens/not-found'
+
+function ErrorFallback({error}) {
+  return (
+    <ErrorMessage
+      error={error}
+      css={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    />
+  )
+}
+
+function AuthenticatedApp() {
+  // get user and logout function from AuthContext using useContext
+  const {user, logout} = useAuth()
+
+  return (
+    <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
       <div
         css={{
           display: 'flex',
@@ -47,15 +83,25 @@ function AuthenticatedApp({user, logout}) {
           <Nav />
         </div>
         <main css={{width: '100%'}}>
+<<<<<<< HEAD
           <AppRoutes user={user} />
         </main>
       </div>
     </React.Fragment>
+=======
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <AppRoutes />
+          </ErrorBoundary>
+        </main>
+      </div>
+    </ErrorBoundary>
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
   )
 }
 
 function NavLink(props) {
   const match = useMatch(props.to)
+<<<<<<< HEAD
 
   // if the props.to === matches, apply the active class
 
@@ -78,6 +124,11 @@ function NavLink(props) {
       // }}
       css={[
         // styles 1
+=======
+  return (
+    <RouterLink
+      css={[
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
         {
           display: 'block',
           padding: '8px 15px 8px 10px',
@@ -93,13 +144,20 @@ function NavLink(props) {
             background: colors.gray10,
           },
         },
+<<<<<<< HEAD
         // styles 2
+=======
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
         match
           ? {
               borderLeft: `5px solid ${colors.indigo}`,
               background: colors.gray10,
               ':hover': {
+<<<<<<< HEAD
                 background: colors.gray20,
+=======
+                background: colors.gray10,
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
               },
             }
           : null,
@@ -131,6 +189,15 @@ function Nav() {
         }}
       >
         <li>
+<<<<<<< HEAD
+=======
+          <NavLink to="/list">Reading List</NavLink>
+        </li>
+        <li>
+          <NavLink to="/finished">Finished Books</NavLink>
+        </li>
+        <li>
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
           <NavLink to="/discover">Discover</NavLink>
         </li>
       </ul>
@@ -138,6 +205,7 @@ function Nav() {
   )
 }
 
+<<<<<<< HEAD
 function AppRoutes({user}) {
   return (
     <div>
@@ -148,12 +216,26 @@ function AppRoutes({user}) {
         <Route path="*" element={<NotFoundScreen />} />
       </Routes>
     </div>
+=======
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/list" element={<ReadingListScreen />} />
+      <Route path="/finished" element={<FinishedScreen />} />
+      <Route path="/discover" element={<DiscoverBooksScreen />} />
+      <Route path="/book/:bookId" element={<BookScreen />} />
+      <Route path="*" element={<NotFoundScreen />} />
+    </Routes>
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
   )
 }
 
 export {AuthenticatedApp}
+<<<<<<< HEAD
 
 /*
 eslint
   jsx-a11y/anchor-has-content: "off",
 */
+=======
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3

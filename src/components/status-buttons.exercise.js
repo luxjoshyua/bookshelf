@@ -9,6 +9,7 @@ import {
   FaBook,
   FaTimesCircle,
 } from 'react-icons/fa'
+<<<<<<< HEAD
 import Tooltip from '@reach/tooltip'
 import {useAsync} from 'utils/hooks'
 import {
@@ -29,6 +30,25 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
     } else {
       run(onClick())
     }
+=======
+
+import Tooltip from '@reach/tooltip'
+import {
+  useListItem,
+  useUpdateListItem,
+  useCreateListItem,
+  useRemoveListItem,
+} from 'utils/list-items'
+import * as colors from 'styles/colors'
+import {useAsync} from 'utils/hooks'
+import {CircleButton, Spinner} from './lib'
+
+function TooltipButton({label, highlight, onClick, icon, ...rest}) {
+  const {isLoading, isError, error, run} = useAsync()
+
+  function handleClick() {
+    run(onClick())
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
   }
 
   return (
@@ -55,12 +75,20 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
   )
 }
 
+<<<<<<< HEAD
 function StatusButtons({user, book}) {
   const listItem = useListItem(user, book.id)
 
   const [update] = useUpdateListItem(user, {throwOnError: true})
   const [remove] = useRemoveListItem(user, {throwOnError: true})
   const [create] = useCreateListItem(user, {throwOnError: true})
+=======
+function StatusButtons({book}) {
+  const listItem = useListItem(book.id)
+  const [update] = useUpdateListItem({throwOnError: true})
+  const [remove] = useRemoveListItem({throwOnError: true})
+  const [create] = useCreateListItem({throwOnError: true})
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 
   return (
     <React.Fragment>

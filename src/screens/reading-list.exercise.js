@@ -1,10 +1,10 @@
-// export * from './reading-list.final'
+import * as React from 'react'
+import {Link} from 'components/lib'
+import {ListItemList} from 'components/list-item-list'
 
-<<<<<<< HEAD
-function ReadingListScreen({user}) {
+function ReadingListScreen() {
   return (
     <ListItemList
-      user={user}
       filterListItems={li => !li.finishDate}
       noListItems={
         <p>
@@ -25,6 +25,3 @@ function ReadingListScreen({user}) {
 }
 
 export {ReadingListScreen}
-=======
-export * from './reading-list.exercise'
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3

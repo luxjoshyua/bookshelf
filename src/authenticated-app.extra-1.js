@@ -1,11 +1,12 @@
-// export * from './authenticated-app.final'
+/** @jsx jsx */
+import {jsx} from '@emotion/core'
 
-<<<<<<< HEAD
 import {Routes, Route, Link as RouterLink, useMatch} from 'react-router-dom'
 import {ErrorBoundary} from 'react-error-boundary'
 import {Button, ErrorMessage, FullPageErrorFallback} from './components/lib'
 import * as mq from './styles/media-queries'
 import * as colors from './styles/colors'
+import {useAuth} from './context/auth-context'
 import {ReadingListScreen} from './screens/reading-list'
 import {FinishedScreen} from './screens/finished'
 import {DiscoverBooksScreen} from './screens/discover'
@@ -27,7 +28,8 @@ function ErrorFallback({error}) {
   )
 }
 
-function AuthenticatedApp({user, logout}) {
+function AuthenticatedApp() {
+  const {user, logout} = useAuth()
   return (
     <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
       <div
@@ -65,7 +67,7 @@ function AuthenticatedApp({user, logout}) {
         </div>
         <main css={{width: '100%'}}>
           <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <AppRoutes user={user} />
+            <AppRoutes />
           </ErrorBoundary>
         </main>
       </div>
@@ -87,7 +89,7 @@ function NavLink(props) {
           color: colors.text,
           borderRadius: '2px',
           borderLeft: '5px solid transparent',
-          ':hover,:focus': {
+          ':hover': {
             color: colors.indigo,
             textDecoration: 'none',
             background: colors.gray10,
@@ -97,7 +99,7 @@ function NavLink(props) {
           ? {
               borderLeft: `5px solid ${colors.indigo}`,
               background: colors.gray10,
-              ':hover,:focus': {
+              ':hover': {
                 background: colors.gray10,
               },
             }
@@ -143,22 +145,16 @@ function Nav() {
   )
 }
 
-function AppRoutes({user}) {
+function AppRoutes() {
   return (
     <Routes>
-      <Route path="/list" element={<ReadingListScreen user={user} />} />
-      <Route path="/finished" element={<FinishedScreen user={user} />} />
-      <Route path="/discover" element={<DiscoverBooksScreen user={user} />} />
-      <Route path="/book/:bookId" element={<BookScreen user={user} />} />
+      <Route path="/list" element={<ReadingListScreen />} />
+      <Route path="/finished" element={<FinishedScreen />} />
+      <Route path="/discover" element={<DiscoverBooksScreen />} />
+      <Route path="/book/:bookId" element={<BookScreen />} />
       <Route path="*" element={<NotFoundScreen />} />
     </Routes>
   )
 }
 
 export {AuthenticatedApp}
-=======
-export * from './authenticated-app.exercise'
-
-// 💯 create a `useAuth` hook
-// export * from './authenticated-app.extra-1'
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3

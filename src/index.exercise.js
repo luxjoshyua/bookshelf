@@ -2,6 +2,7 @@ import {loadDevTools} from './dev-tools/load'
 import './bootstrap'
 import * as React from 'react'
 import {createRoot} from 'react-dom/client'
+<<<<<<< HEAD
 import {App} from './app'
 import {ReactQueryConfigProvider} from 'react-query'
 
@@ -21,6 +22,10 @@ const queryConfig = {
     },
   },
 }
+=======
+import {AppProviders} from 'context'
+import {App} from './app'
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 
 // ignore the rootRef in this file. I'm just doing it here to make
 // the tests I write to check your work easier.
@@ -28,9 +33,15 @@ export const rootRef = {}
 loadDevTools(() => {
   const root = createRoot(document.getElementById('root'))
   root.render(
+<<<<<<< HEAD
     <ReactQueryConfigProvider config={queryConfig}>
       <App />
     </ReactQueryConfigProvider>,
+=======
+    <AppProviders>
+      <App />
+    </AppProviders>,
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
   )
   rootRef.current = root
 })

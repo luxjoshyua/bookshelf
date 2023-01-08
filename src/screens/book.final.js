@@ -6,6 +6,7 @@ import debounceFn from 'debounce-fn'
 import {FaRegCalendarAlt} from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
 import {useParams} from 'react-router-dom'
+<<<<<<< HEAD
 import {useQuery, useMutation, queryCache} from 'react-query'
 import {client} from 'utils/api-client'
 import {formatDate} from 'utils/misc'
@@ -39,6 +40,21 @@ function BookScreen({user}) {
       client(`list-items`, {token: user.token}).then(data => data.listItems),
   })
   const listItem = listItems?.find(li => li.bookId === bookId) ?? null
+=======
+import {useBook} from 'utils/books'
+import {useListItem, useUpdateListItem} from 'utils/list-items'
+import {formatDate} from 'utils/misc'
+import * as mq from 'styles/media-queries'
+import * as colors from 'styles/colors'
+import {Spinner, Textarea, ErrorMessage} from 'components/lib'
+import {Rating} from 'components/rating'
+import {StatusButtons} from 'components/status-buttons'
+
+function BookScreen() {
+  const {bookId} = useParams()
+  const book = useBook(bookId)
+  const listItem = useListItem(bookId)
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 
   const {title, author, coverImageUrl, publisher, synopsis} = book
 
@@ -81,6 +97,7 @@ function BookScreen({user}) {
                 minHeight: 100,
               }}
             >
+<<<<<<< HEAD
               {book.loadingBook ? null : (
                 <StatusButtons user={user} book={book} />
               )}
@@ -90,6 +107,13 @@ function BookScreen({user}) {
             {listItem?.finishDate ? (
               <Rating user={user} listItem={listItem} />
             ) : null}
+=======
+              {book.loadingBook ? null : <StatusButtons book={book} />}
+            </div>
+          </div>
+          <div css={{marginTop: 10, height: 46}}>
+            {listItem?.finishDate ? <Rating listItem={listItem} /> : null}
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
             {listItem ? <ListItemTimeframe listItem={listItem} /> : null}
           </div>
           <br />
@@ -97,7 +121,11 @@ function BookScreen({user}) {
         </div>
       </div>
       {!book.loadingBook && listItem ? (
+<<<<<<< HEAD
         <NotesTextarea user={user} listItem={listItem} />
+=======
+        <NotesTextarea listItem={listItem} />
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
       ) : null}
     </div>
   )
@@ -121,6 +149,7 @@ function ListItemTimeframe({listItem}) {
   )
 }
 
+<<<<<<< HEAD
 function NotesTextarea({listItem, user}) {
   const [mutate] = useMutation(
     updates =>
@@ -135,6 +164,13 @@ function NotesTextarea({listItem, user}) {
     () => debounceFn(mutate, {wait: 300}),
     [mutate],
   )
+=======
+function NotesTextarea({listItem}) {
+  const [mutate, {error, isError, isLoading}] = useUpdateListItem()
+  const debouncedMutate = React.useMemo(() => debounceFn(mutate, {wait: 300}), [
+    mutate,
+  ])
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 
   function handleNotesChange(e) {
     debouncedMutate({id: listItem.id, notes: e.target.value})
@@ -155,6 +191,17 @@ function NotesTextarea({listItem, user}) {
         >
           Notes
         </label>
+<<<<<<< HEAD
+=======
+        {isError ? (
+          <ErrorMessage
+            error={error}
+            variant="inline"
+            css={{marginLeft: 6, fontSize: '0.7em'}}
+          />
+        ) : null}
+        {isLoading ? <Spinner /> : null}
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
       </div>
       <Textarea
         id="notes"

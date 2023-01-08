@@ -2,10 +2,17 @@
 import {jsx} from '@emotion/core'
 
 import * as React from 'react'
+<<<<<<< HEAD
 import {useMutation, queryCache} from 'react-query'
 import {client} from 'utils/api-client'
 import {FaStar} from 'react-icons/fa'
 import * as colors from 'styles/colors'
+=======
+import {useUpdateListItem} from 'utils/list-items'
+import {FaStar} from 'react-icons/fa'
+import * as colors from 'styles/colors'
+import {ErrorMessage} from 'components/lib'
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 
 const visuallyHiddenCSS = {
   border: '0',
@@ -18,6 +25,7 @@ const visuallyHiddenCSS = {
   width: '1px',
 }
 
+<<<<<<< HEAD
 function Rating({listItem, user}) {
   const [isTabbing, setIsTabbing] = React.useState(false)
   const [update] = useMutation(
@@ -29,6 +37,11 @@ function Rating({listItem, user}) {
       }),
     {onSettled: () => queryCache.invalidateQueries('list-items')},
   )
+=======
+function Rating({listItem}) {
+  const [isTabbing, setIsTabbing] = React.useState(false)
+  const [update, {error, isError}] = useUpdateListItem()
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 
   React.useEffect(() => {
     function handleKeyDown(event) {
@@ -108,6 +121,16 @@ function Rating({listItem, user}) {
       }}
     >
       <span css={{display: 'flex'}}>{stars}</span>
+<<<<<<< HEAD
+=======
+      {isError ? (
+        <ErrorMessage
+          error={error}
+          variant="inline"
+          css={{marginLeft: 6, fontSize: '0.7em'}}
+        />
+      ) : null}
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
     </div>
   )
 }

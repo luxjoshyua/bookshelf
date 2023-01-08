@@ -1,10 +1,10 @@
-// export * from './finished.final'
+import * as React from 'react'
+import {Link} from 'components/lib'
+import {ListItemList} from 'components/list-item-list'
 
-<<<<<<< HEAD
-function FinishedScreen({user}) {
+function FinishedScreen() {
   return (
     <ListItemList
-      user={user}
       filterListItems={li => Boolean(li.finishDate)}
       noListItems={
         <p>
@@ -26,6 +26,3 @@ function FinishedScreen({user}) {
 }
 
 export {FinishedScreen}
-=======
-export * from './finished.exercise'
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3

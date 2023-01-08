@@ -3,6 +3,10 @@ import './bootstrap'
 import * as React from 'react'
 import {createRoot} from 'react-dom/client'
 import {ReactQueryConfigProvider} from 'react-query'
+<<<<<<< HEAD
+=======
+import {AuthProvider} from './context/auth-context'
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 import {App} from './app'
 
 const queryConfig = {
@@ -24,7 +28,13 @@ loadDevTools(() => {
   const root = createRoot(document.getElementById('root'))
   root.render(
     <ReactQueryConfigProvider config={queryConfig}>
+<<<<<<< HEAD
       <App />
+=======
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
     </ReactQueryConfigProvider>,
   )
   rootRef.current = root

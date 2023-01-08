@@ -6,10 +6,15 @@ import debounceFn from 'debounce-fn'
 import {FaRegCalendarAlt} from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
 import {useParams} from 'react-router-dom'
+<<<<<<< HEAD
+=======
+import {useBook} from 'utils/books'
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 import {useListItem, useUpdateListItem} from 'utils/list-items'
 import {formatDate} from 'utils/misc'
 import * as mq from 'styles/media-queries'
 import * as colors from 'styles/colors'
+<<<<<<< HEAD
 import {Textarea, ErrorMessage, Spinner} from 'components/lib'
 import {Rating} from 'components/rating'
 import {StatusButtons} from 'components/status-buttons'
@@ -21,6 +26,17 @@ function BookScreen({user}) {
   // identifies that book as unique and also validates the request
   const book = useBook(bookId, user)
   const listItem = useListItem(user, book.id)
+=======
+import {Spinner, Textarea, ErrorMessage} from 'components/lib'
+import {Rating} from 'components/rating'
+import {StatusButtons} from 'components/status-buttons'
+
+function BookScreen() {
+  const {bookId} = useParams()
+  const book = useBook(bookId)
+  const listItem = useListItem(bookId)
+
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
   const {title, author, coverImageUrl, publisher, synopsis} = book
 
   return (
@@ -62,6 +78,7 @@ function BookScreen({user}) {
                 minHeight: 100,
               }}
             >
+<<<<<<< HEAD
               {book.loadingBook ? null : (
                 <StatusButtons user={user} book={book} />
               )}
@@ -71,6 +88,13 @@ function BookScreen({user}) {
             {listItem?.finishDate ? (
               <Rating user={user} listItem={listItem} />
             ) : null}
+=======
+              {book.loadingBook ? null : <StatusButtons book={book} />}
+            </div>
+          </div>
+          <div css={{marginTop: 10, height: 46}}>
+            {listItem?.finishDate ? <Rating listItem={listItem} /> : null}
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
             {listItem ? <ListItemTimeframe listItem={listItem} /> : null}
           </div>
           <br />
@@ -78,7 +102,11 @@ function BookScreen({user}) {
         </div>
       </div>
       {!book.loadingBook && listItem ? (
+<<<<<<< HEAD
         <NotesTextarea user={user} listItem={listItem} />
+=======
+        <NotesTextarea listItem={listItem} />
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
       ) : null}
     </div>
   )
@@ -102,12 +130,17 @@ function ListItemTimeframe({listItem}) {
   )
 }
 
+<<<<<<< HEAD
 function NotesTextarea({listItem, user}) {
   // destructure the error and isError properties from our utility function
   // useMutate always returns an object with heaps of properties in it
   // https://tanstack.com/query/v4/docs/react/reference/useMutation
   const [mutate, {error, isError, isLoading}] = useUpdateListItem(user)
 
+=======
+function NotesTextarea({listItem}) {
+  const [mutate, {error, isError, isLoading}] = useUpdateListItem()
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
   const debouncedMutate = React.useMemo(
     () => debounceFn(mutate, {wait: 300}),
     [mutate],

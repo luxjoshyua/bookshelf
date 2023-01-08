@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
 
@@ -74,6 +75,23 @@ function App() {
       <UnauthenticatedApp login={login} register={register} />
     )
   }
+=======
+import * as React from 'react'
+import {BrowserRouter as Router} from 'react-router-dom'
+import {useAuth} from './context/auth-context'
+import {AuthenticatedApp} from './authenticated-app'
+import {UnauthenticatedApp} from './unauthenticated-app'
+
+function App() {
+  const {user} = useAuth()
+  return user ? (
+    <Router>
+      <AuthenticatedApp />
+    </Router>
+  ) : (
+    <UnauthenticatedApp />
+  )
+>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 }
 
 export {App}

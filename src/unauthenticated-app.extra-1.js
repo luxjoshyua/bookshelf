@@ -1,29 +1,30 @@
-<<<<<<< HEAD
-// export * from './unauthenticated-app.final'
+/** @jsx jsx */
+import {jsx} from '@emotion/core'
 
-<<<<<<<< HEAD:src/index.extra-3.js
-import 'bootstrap/dist/css/bootstrap-reboot.css'
-import '@reach/dialog/styles.css'
 import * as React from 'react'
-import {createRoot} from 'react-dom/client'
-import {Button, Input, FormGroup, Spinner} from './components/lib'
+import {useAuth} from './context/auth-context'
+import {Input, Button, Spinner, FormGroup, ErrorMessage} from './components/lib'
 import {Modal, ModalContents, ModalOpenButton} from './components/modal'
 import {Logo} from './components/logo'
 import {useAsync} from './utils/hooks'
 
 function LoginForm({onSubmit, submitButton}) {
+  const {isLoading, isError, error, run} = useAsync()
   function handleSubmit(event) {
     event.preventDefault()
     const {username, password} = event.target.elements
 
-    onSubmit({
-      username: username.value,
-      password: password.value,
-    })
+    run(
+      onSubmit({
+        username: username.value,
+        password: password.value,
+      }),
+    )
   }
 
   return (
     <form
+      onSubmit={handleSubmit}
       css={{
         display: 'flex',
         flexDirection: 'column',
@@ -34,7 +35,6 @@ function LoginForm({onSubmit, submitButton}) {
           maxWidth: '300px',
         },
       }}
-      onSubmit={handleSubmit}
     >
       <FormGroup>
         <label htmlFor="username">Username</label>
@@ -45,14 +45,22 @@ function LoginForm({onSubmit, submitButton}) {
         <Input id="password" type="password" />
       </FormGroup>
       <div>
-        {React.cloneElement(submitButton, {type: 'submit'})}
-        <Spinner css={{marginLeft: 5}} />
+        {React.cloneElement(
+          submitButton,
+          {type: 'submit'},
+          ...(Array.isArray(submitButton.props.children)
+            ? submitButton.props.children
+            : [submitButton.props.children]),
+          isLoading ? <Spinner css={{marginLeft: 5}} /> : null,
+        )}
       </div>
+      {isError ? <ErrorMessage error={error} /> : null}
     </form>
   )
 }
 
-function UnauthenticatedApp({login, register}) {
+function UnauthenticatedApp() {
+  const {login, register} = useAuth()
   return (
     <div
       css={{
@@ -101,30 +109,3 @@ function UnauthenticatedApp({login, register}) {
 }
 
 export {UnauthenticatedApp}
-========
-export * from './unauthenticated-app.exercise'
-
-// 💯 create a `useAuth` hook
-// export * from './unauthenticated-app.extra-1'
->>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3:src/unauthenticated-app.js
-=======
-import {loadDevTools} from './dev-tools/load'
-import './bootstrap'
-import * as React from 'react'
-import {createRoot} from 'react-dom/client'
-import {App} from './app'
-import {AppProviders} from './context'
-
-// ignore the rootRef in this file. I'm just doing it here to make
-// the tests I write to check your work easier.
-export const rootRef = {}
-loadDevTools(() => {
-  const root = createRoot(document.getElementById('root'))
-  root.render(
-    <AppProviders>
-      <App />
-    </AppProviders>,
-  )
-  rootRef.current = root
-})
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
