@@ -1,6 +1,6 @@
-/** @jsx jsx */
-import {jsx} from '@emotion/core'
+// export * from './unauthenticated-app.final'
 
+<<<<<<< HEAD:src/unauthenticated-app.extra-1.js
 import * as React from 'react'
 import {useAuth} from './context/auth-context'
 import {Input, Button, Spinner, FormGroup, ErrorMessage} from './components/lib'
@@ -109,3 +109,9 @@ function UnauthenticatedApp() {
 }
 
 export {UnauthenticatedApp}
+=======
+export * from './unauthenticated-app.exercise'
+
+// 💯 Create ModalContentsBase
+// export * from './unauthenticated-app.extra-2'
+>>>>>>> 0d8934af4e1a572a9d810768b57f69f4588453c5:src/unauthenticated-app.js

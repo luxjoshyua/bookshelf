@@ -1,6 +1,4 @@
 // export * from './authenticated-app.final'
-
-<<<<<<< HEAD
 import {Routes, Route, Link as RouterLink, useMatch} from 'react-router-dom'
 import {ErrorBoundary} from 'react-error-boundary'
 import {Button, ErrorMessage, FullPageErrorFallback} from './components/lib'
@@ -156,9 +154,7 @@ function AppRoutes({user}) {
 }
 
 export {AuthenticatedApp}
-=======
 export * from './authenticated-app.exercise'
 
 // 💯 create a `useAuth` hook
 // export * from './authenticated-app.extra-1'
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
