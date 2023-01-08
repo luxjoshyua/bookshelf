@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import {screen, act} from '@testing-library/react'
 =======
 import chalk from 'chalk'
@@ -20,10 +21,37 @@ function withMessage(cb, message, {solo = true} = {}) {
 >>>>>>> ef80adb8ec75d25a42e6caf4065c62d0c4360881
 
 test('renders the app', () => {
+=======
+import '@testing-library/jest-dom/extend-expect'
+import {screen, waitForElementToBeRemoved, act} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {server} from 'test/server'
+
+// enable API mocking in test runs using the same request handlers
+// as for the client-side mocking.
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+afterEach(() => server.resetHandlers())
+
+// this is a pretty comprehensive test and CI is pretty slow...
+jest.setTimeout(25000)
+
+const waitForLoadingToFinish = () =>
+  waitForElementToBeRemoved(
+    () => [
+      ...screen.queryAllByLabelText(/loading/i),
+      ...screen.queryAllByText(/loading/i),
+    ],
+    {timeout: 4000},
+  )
+
+test('renders the app', async () => {
+>>>>>>> 2c0c72fa461530fdfa281fa46911582830382045
   const root = document.createElement('div')
   root.id = 'root'
   document.body.append(root)
 
+<<<<<<< HEAD
   let reactRoot
   act(() => {
     reactRoot = require('..').root
@@ -62,5 +90,21 @@ ${prettyDOM(cssEl)}
 >>>>>>> ef80adb8ec75d25a42e6caf4065c62d0c4360881
   // cleanup
   act(() => reactRoot.unmount())
+=======
+  let rootRef
+  act(() => {
+    rootRef = require('..').rootRef
+  })
+
+  await userEvent.type(screen.getByPlaceholderText(/search/i), 'voice of war')
+  await userEvent.click(screen.getByLabelText(/search/i))
+
+  await waitForLoadingToFinish()
+
+  expect(screen.getByText(/voice of war/i)).toBeInTheDocument()
+
+  // cleanup
+  act(() => rootRef.current.unmount())
+>>>>>>> 2c0c72fa461530fdfa281fa46911582830382045
   document.body.removeChild(root)
 })

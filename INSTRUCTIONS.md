@@ -1,8 +1,8 @@
-<<<<<<< HEAD
 # Render a React App
-=======
+
 # Style React Components
->>>>>>> ef80adb8ec75d25a42e6caf4065c62d0c4360881
+
+# Make HTTP Requests
 
 ## 📝 Your Notes
 
@@ -10,14 +10,12 @@ Elaborate on your learnings here in `INSTRUCTIONS.md`
 
 ## Background
 
-<<<<<<< HEAD
 The first step to any React app is to create a component and render it to the
 page. In modern applications with modern tools, this means you'll import React
 and ReactDOM and use them to create React elements, and render those to a `div`.
-=======
-There are many ways to style React applications, each approach comes with its
-own trade-offs, but ultimately all of them comes back stylesheets and inline
-styles.
+======= There are many ways to style React applications, each approach comes
+with its own trade-offs, but ultimately all of them comes back stylesheets and
+inline styles.
 
 Because we're using webpack, we can import css files directly into our
 application and utilize the cascading nature of CSS to our advantage for some
@@ -169,13 +167,84 @@ this all work.
 > Note also that for this to work, you need to disable the JSX transform feature
 > new to React 17. We do this in the `.env` file with the
 > `DISABLE_NEW_JSX_TRANSFORM=true` line.
->>>>>>> ef80adb8ec75d25a42e6caf4065c62d0c4360881
+>
+> > > > > > > # ef80adb8ec75d25a42e6caf4065c62d0c4360881
+> > > > > > >
+> > > > > > > Our app wouldn't be very interesting without the ability to
+> > > > > > > request data from a backend for the user to view and interact
+> > > > > > > with. The way to do this in the web is using HTTP with the
+> > > > > > > `window.fetch` API. Here's a quick simple example of that API in
+> > > > > > > action:
+
+```javascript
+window
+  .fetch('http://example.com/movies.json')
+  .then(response => {
+    return response.json()
+  })
+  .then(data => {
+    console.log(data)
+  })
+```
+
+All the HTTP methods are supported as well, for example, here's how you would
+POST data:
+
+```javascript
+window
+  .fetch('http://example.com/movies', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      // if auth is required. Each API may be different, but
+      // the Authorization header with a token is common.
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data), // body data type must match "content-type" header
+  })
+  .then(response => {
+    return response.json()
+  })
+  .then(data => {
+    console.log(data)
+  })
+```
+
+If the request fails with an unsuccessful status code (`>= 400`), then the
+`response` object's `ok` property will be false. It's common to reject the
+promise in this case:
+
+```javascript
+window.fetch(url).then(async response => {
+  const data = await response.json()
+  if (response.ok) {
+    return data
+  } else {
+    return Promise.reject(data)
+  }
+})
+```
+
+It's good practice to wrap `window.fetch` in your own function so you can set
+defaults (especially handy for authentication). Additionally, it's common to
+have "clients" which build upon this wrapper for operations on different
+resources.
+
+Integrating this kind of thing with React involves utilizing React's `useEffect`
+hook for making the request and `useState` for managing the status of the
+request as well as the response data and error information.
+
+You might consider making the network request in the event handler. In general I
+recommend to do all your side effects inside the `useEffect`. This is because in
+the event handler you don't have any possibility to prevent race conditions, or
+to implement any cancellation mechanism.
+
+📜 https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 
 ## Exercise
 
 Production deploys:
 
-<<<<<<< HEAD
 - [Exercise](https://exercises-01-bootstrap.bookshelf.lol/exercise)
 - [Final](https://exercises-01-bootstrap.bookshelf.lol/)
 
@@ -185,7 +254,6 @@ let's also render Login and Register buttons.
 
 ### Files
 
-=======
 - [Exercise](https://exercises-02-styles.bookshelf.lol/exercise)
 - [Final](https://exercises-02-styles.bookshelf.lol/)
 
@@ -218,61 +286,11 @@ consistent way.
 ### Files
 
 - `src/components/lib.js`
->>>>>>> ef80adb8ec75d25a42e6caf4065c62d0c4360881
+
 - `src/index.js`
 
 ## Extra Credit
 
-<<<<<<< HEAD
-### 1. 💯 Use `@reach/dialog`
-
-[Production deploy](https://exercises-01-bootstrap.bookshelf.lol/extra-1)
-
-👨‍💼 When the user clicks "Login" or "Register", we should open a modal with a
-form for them to provide their username and password.
-
-In this extra credit, get the `Dialog` component from `@reach/dialog` and make
-it open when the user clicks the Login or Register button. It's a fantastic
-component with a great API and fantastic accessibility characteristics.
-
-📜 https://reacttraining.com/reach-ui/dialog
-
-💰 as with everything, there are many ways to do this. For me, I actually render
-two individual dialogs and toggle which is open based on a `openModal` state
-which can be set to `none`, `login`, or `register`.
-
-💰 Don't forget to include the styles: `import '@reach/dialog/styles.css'`
-
-**Files:**
-
-- `src/index.js`
-
-### 2. 💯 Create a LoginForm component
-
-[Production deploy](https://exercises-01-bootstrap.bookshelf.lol/extra-2)
-
-👨‍💼 The user should be able to login or register by providing a username and
-password.
-
-For this one, create a `LoginForm` component which renders a form accepting a
-username and password. When the user submits the form, it should call an
-`onSubmit` prop with the `username` and `password`. Here's how it will be used:
-
-```javascript
-function Example() {
-  function handleSubmit(formData) {
-    console.log('login', formData)
-  }
-  return <LoginForm onSubmit={handleSubmit} buttonText="Login" />
-}
-```
-
-That should render a form where the submit button says "Login" and when the user
-clicks it, you'll get a console.log with the form's data.
-
-**Files:**
-
-=======
 ### 1. 💯 use the emotion macro
 
 [Production deploy](https://exercises-02-styles.bookshelf.lol/extra-1)
@@ -368,16 +386,121 @@ import {FaSpinner} from 'react-icons/fa'
 **Files:**
 
 - `src/components/lib.js`
->>>>>>> ef80adb8ec75d25a42e6caf4065c62d0c4360881
-- `src/index.js`
+- # `src/index.js`
+- [Exercise](https://exercises-03-data-fetching.bookshelf.lol/exercise)
+- [Final](https://exercises-03-data-fetching.bookshelf.lol/)
+
+👨‍💼 Our users are getting restless and want to start looking at some books, so
+we're putting our login flow to the side for a moment so we can work on the book
+search feature. The backend is ready to go for this and we've already set up an
+environment variable which we can use in our code for the API url (you can see
+that in `.env` and `.env.development`). The URL for the search API is:
+
+```javascript
+const endpoint = `${process.env.REACT_APP_API_URL}/books?query=Voice%20of%20War`
+```
+
+Making a request to this endpoint will return this data:
+
+```json
+{
+  "books": [
+    {
+      "title": "Voice of War",
+      "author": "Zack Argyle",
+      "coverImageUrl": "https://images-na.ssl-images-amazon.com/images/I/41JodZ5Vl%2BL.jpg",
+      "id": "B084F96GFZ",
+      "pageCount": 372,
+      "publisher": "Self Published",
+      "synopsis": "..."
+    }
+  ]
+}
+```
+
+We've also already designed the page. All that's left is to wire up our design
+with the backend. But we've never made a request to the backend yet so you'll
+need to create the API `client` function that we'll use for making all requests
+to our API (like searching books). Once that's ready, you can use it in your
+component.
+
+### Files
+
+- `src/discover.js`
+- `src/utils/api-client.js`
+
+## Extra Credit
+
+### 1. 💯 handle failed requests
+
+[Production deploy](https://exercises-03-data-fetching.bookshelf.lol/extra-1)
+
+Our backend developers try really hard to give you the data you need, but
+sometimes things just fail (💰 especially if you send the word "FAIL" as the
+query... go ahead, try it).
+
+Add support for showing the user helpful information in the event of a failure.
+Our designer gave us this which you can use for the UI:
+
+For the search icon:
+
+```javascript
+// get FaTimes from react-icons
+<FaTimes aria-label="error" css={{color: colors.danger}} />
+```
+
+```javascript
+// display this between the search input and the results
+{
+  isError ? (
+    <div css={{color: colors.danger}}>
+      <p>There was an error:</p>
+      <pre>{error.message}</pre>
+    </div>
+  ) : null
+}
+```
+
+💰 I wasn't joking. For some reason every time you send the backend the word
+"FAIL" it results in a failure. Our backend devs are completely baffled, but it
+sure makes it easier for you to test the error state out!
+
+**Files:**
+
+- `src/utils/api-client.js`
+- `src/discover.js`
+
+### 2. 💯 use the useAsync hook
+
+[Production deploy](https://exercises-03-data-fetching.bookshelf.lol/extra-2)
+
+After you finished with everything, one of the other UI devs 🧝‍♀️ was reviewing
+your PR and asked why you didn't use the `useAsync` hook she wrote last week.
+You respond by palming your face 🤦‍♂️ and go back to the drawing board.
+
+`useAsync` is slightly different from what you've built. Here's an example:
+
+```javascript
+import {useAsync} from 'utils/hooks'
+
+const {data, error, run, isLoading, isError, isSuccess} = useAsync()
+
+// in an event handler/effect/wherever
+run(doSomethingThatReturnsAPromise())
+```
+
+This seems to handle your use case well, so let's swap your custom solution with
+your co-worker's `useAsync` hook.
+
+**Files:**
+
+- `src/discover.js`
 
 ## 🦉 Elaboration and Feedback
 
 After the instruction, if you want to remember what you've just learned, then
 fill out the elaboration and feedback form:
 
-<<<<<<< HEAD
 https://ws.kcd.im/?ws=Build%20React%20Apps&e=01%3A%20Render%20a%20React%20App&em=
-=======
 https://ws.kcd.im/?ws=Build%20React%20Apps&e=02%3A%20Style%20React%20Components&em=
->>>>>>> ef80adb8ec75d25a42e6caf4065c62d0c4360881
+https://ws.kcd.im/?ws=Build%20React%20Apps&e=03%3A%20Make%20HTTP%20Requests&em=

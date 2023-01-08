@@ -1,14 +1,14 @@
-// export * from './index.final'
+import {loadDevTools} from './dev-tools/load'
+import './bootstrap'
+import * as React from 'react'
+import {createRoot} from 'react-dom/client'
+import {DiscoverBooksScreen} from './discover'
 
-export * from './index.exercise'
-
-<<<<<<< HEAD
-// 💯 Use `@reach/dialog`
-// export * from './index.extra-1'
-
-// 💯 Create a LoginForm component
-// export * from './index.extra-2'
-=======
-// 💯 make a loading spinner component
-// export * from './index.extra-3'
->>>>>>> ef80adb8ec75d25a42e6caf4065c62d0c4360881
+// ignore the rootRef in this file. I'm just doing it here to make
+// the tests I write to check your work easier.
+export const rootRef = {}
+loadDevTools(() => {
+  const root = createRoot(document.getElementById('root'))
+  root.render(<DiscoverBooksScreen />)
+  rootRef.current = root
+})
