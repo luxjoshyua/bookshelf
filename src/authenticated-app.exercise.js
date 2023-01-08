@@ -1,20 +1,6 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
-<<<<<<< HEAD
 
-import * as React from 'react'
-import {Routes, Route, Link, useMatch} from 'react-router-dom'
-import {Button} from './components/lib'
-import * as mq from './styles/media-queries'
-import * as colors from './styles/colors'
-import {DiscoverBooksScreen} from 'screens/discover'
-import {BookScreen} from 'screens/book'
-import {NotFoundScreen} from 'screens/not-found'
-
-function AuthenticatedApp({user, logout}) {
-  return (
-    <React.Fragment>
-=======
 import {Routes, Route, Link as RouterLink, useMatch} from 'react-router-dom'
 import {ErrorBoundary} from 'react-error-boundary'
 import {Button, ErrorMessage, FullPageErrorFallback} from './components/lib'
@@ -43,12 +29,9 @@ function ErrorFallback({error}) {
 }
 
 function AuthenticatedApp() {
-  // get user and logout function from AuthContext using useContext
   const {user, logout} = useAuth()
-
   return (
     <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
       <div
         css={{
           display: 'flex',
@@ -83,52 +66,20 @@ function AuthenticatedApp() {
           <Nav />
         </div>
         <main css={{width: '100%'}}>
-<<<<<<< HEAD
-          <AppRoutes user={user} />
-        </main>
-      </div>
-    </React.Fragment>
-=======
           <ErrorBoundary FallbackComponent={ErrorFallback}>
             <AppRoutes />
           </ErrorBoundary>
         </main>
       </div>
     </ErrorBoundary>
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
   )
 }
 
 function NavLink(props) {
   const match = useMatch(props.to)
-<<<<<<< HEAD
-
-  // if the props.to === matches, apply the active class
-
-  return (
-    <Link
-      // css={{
-      //   display: 'block',
-      //   padding: '8px 15px 8px 10px',
-      //   margin: '5px 0',
-      //   width: '100%',
-      //   height: '100%',
-      //   color: colors.text,
-      //   borderRadius: '2px',
-      //   borderLeft: '5px solid transparent',
-      //   ':hover': {
-      //     color: colors.indigo,
-      //     textDecoration: 'none',
-      //     background: colors.gray10,
-      //   },
-      // }}
-      css={[
-        // styles 1
-=======
   return (
     <RouterLink
       css={[
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
         {
           display: 'block',
           padding: '8px 15px 8px 10px',
@@ -144,20 +95,12 @@ function NavLink(props) {
             background: colors.gray10,
           },
         },
-<<<<<<< HEAD
-        // styles 2
-=======
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
         match
           ? {
               borderLeft: `5px solid ${colors.indigo}`,
               background: colors.gray10,
               ':hover': {
-<<<<<<< HEAD
-                background: colors.gray20,
-=======
                 background: colors.gray10,
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
               },
             }
           : null,
@@ -189,15 +132,12 @@ function Nav() {
         }}
       >
         <li>
-<<<<<<< HEAD
-=======
           <NavLink to="/list">Reading List</NavLink>
         </li>
         <li>
           <NavLink to="/finished">Finished Books</NavLink>
         </li>
         <li>
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
           <NavLink to="/discover">Discover</NavLink>
         </li>
       </ul>
@@ -205,18 +145,6 @@ function Nav() {
   )
 }
 
-<<<<<<< HEAD
-function AppRoutes({user}) {
-  return (
-    <div>
-      <Nav />
-      <Routes>
-        <Route path="/discover" element={<DiscoverBooksScreen user={user} />} />
-        <Route path="/book/:bookId" element={<BookScreen user={user} />} />
-        <Route path="*" element={<NotFoundScreen />} />
-      </Routes>
-    </div>
-=======
 function AppRoutes() {
   return (
     <Routes>
@@ -226,16 +154,13 @@ function AppRoutes() {
       <Route path="/book/:bookId" element={<BookScreen />} />
       <Route path="*" element={<NotFoundScreen />} />
     </Routes>
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
   )
 }
 
-export {AuthenticatedApp}
-<<<<<<< HEAD
+// React.lazy expects the module we're importing to export
+// a React component as the default export, so we update this to default
+export default AuthenticatedApp
 
-/*
-eslint
-  jsx-a11y/anchor-has-content: "off",
-*/
-=======
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
+// 🐨 Unfortunately, to make this work for our workshop,
+// you need to add this to src/authenticated-app.js:
+// export {default} from './authenticated-app.exercise'

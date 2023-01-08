@@ -1,24 +1,11 @@
+/** @jsx jsx */
+import {jsx} from '@emotion/core'
+
 import * as React from 'react'
-import {useAsync} from '../utils/hooks'
 import * as auth from 'auth-provider'
-import {client} from '../utils/api-client'
-import {FullPageSpinner, FullPageErrorFallback} from '../components/lib'
-
-const AuthContext = React.createContext()
-// improve from the generic <Context.Provider>, easier for debugging
-AuthContext.displayName = 'AuthContext'
-
-// custom hook to consume context,
-// instead of having to do const {user} = React.useContext(AuthContext) everywhere
-const useAuth = () => {
-  const context = React.useContext(AuthContext)
-
-  if (!context || context === undefined) {
-    throw new Error(`useAuth must be used within an AuthProvider`)
-  }
-  // return the context value
-  return context
-}
+import {client} from 'utils/api-client'
+import {useAsync} from 'utils/hooks'
+import {FullPageSpinner, FullPageErrorFallback} from 'components/lib'
 
 async function getUser() {
   let user = null
@@ -32,22 +19,9 @@ async function getUser() {
   return user
 }
 
-// hook that gives us an authenticated client
-function useClient(endpoint, config) {
-  // endpoint e.g. `books?query=${encodeURIComponent(query)}`
-  // config e.g. {token: user.token}
-  const {
-    user: {token},
-  } = useAuth()
-  // returns a memoized authenticated client
-  // so we don't have to compute the user each time on render. only if user changes
-  return React.useCallback(
-    (endpoint, config) => client(endpoint, {...config, token}),
-    [token],
-  )
-}
+const AuthContext = React.createContext()
+AuthContext.displayName = 'AuthContext'
 
-// component that renders our AuthContext
 function AuthProvider(props) {
   const {
     data: user,
@@ -58,18 +32,35 @@ function AuthProvider(props) {
     isSuccess,
     run,
     setData,
+    status,
   } = useAsync()
 
   React.useEffect(() => {
-    run(getUser())
+    const userPromise = getUser()
+    run(userPromise)
   }, [run])
 
-  const login = form => auth.login(form).then(user => setData(user))
-  const register = form => auth.register(form).then(user => setData(user))
-  const logout = () => {
+  const login = React.useCallback(
+    form => auth.login(form).then(user => setData(user)),
+    [setData],
+  )
+  const register = React.useCallback(
+    form => auth.register(form).then(user => setData(user)),
+    [setData],
+  )
+  const logout = React.useCallback(() => {
     auth.logout()
     setData(null)
-  }
+  }, [setData])
+
+  // create the object inside useMemo
+  // only rerender when the user changes, because that's the only managed state in the component that changes
+  // ref: https://www.makeuseof.com/javascript-react-memoization/
+  // is actually unnecessary here because the value doesn't change
+  const value = React.useMemo(
+    () => ({user, login, register, logout}),
+    [login, logout, register, user],
+  )
 
   if (isLoading || isIdle) {
     return <FullPageSpinner />
@@ -80,10 +71,28 @@ function AuthProvider(props) {
   }
 
   if (isSuccess) {
-    const value = {user, login, register, logout}
-
     return <AuthContext.Provider value={value} {...props} />
   }
+
+  throw new Error(`Unhandled status: ${status}`)
 }
 
-export {useAuth, useClient, AuthProvider}
+function useAuth() {
+  const context = React.useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error(`useAuth must be used within a AuthProvider`)
+  }
+  return context
+}
+
+function useClient() {
+  const {
+    user: {token},
+  } = useAuth()
+  return React.useCallback(
+    (endpoint, config) => client(endpoint, {...config, token}),
+    [token],
+  )
+}
+
+export {AuthProvider, useAuth, useClient}

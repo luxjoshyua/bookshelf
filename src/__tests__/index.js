@@ -5,6 +5,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import {screen, act} from '@testing-library/react'
 =======
 import chalk from 'chalk'
@@ -40,6 +41,8 @@ import ReactDOM from 'react-dom'
 >>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 =======
 >>>>>>> 0d8934af4e1a572a9d810768b57f69f4588453c5
+=======
+>>>>>>> 9ffd57b3d63611a41c2bcecdb7ebfc6f95fad048
 import '@testing-library/jest-dom/extend-expect'
 import {
   screen,
@@ -53,6 +56,7 @@ import faker from 'faker'
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 8601780b88f7a22f13904b6d2368f8650ebbc846
 =======
 >>>>>>> e7ce8cf894b2339a75ac4832f6c9be0ad2920f26
@@ -62,6 +66,8 @@ import faker from 'faker'
 >>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 =======
 >>>>>>> 0d8934af4e1a572a9d810768b57f69f4588453c5
+=======
+>>>>>>> 9ffd57b3d63611a41c2bcecdb7ebfc6f95fad048
 import {server} from 'test/server'
 
 // enable API mocking in test runs using the same request handlers
@@ -78,6 +84,7 @@ jest.setTimeout(25000)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> e7ce8cf894b2339a75ac4832f6c9be0ad2920f26
@@ -87,6 +94,8 @@ jest.setTimeout(25000)
 >>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 =======
 >>>>>>> 0d8934af4e1a572a9d810768b57f69f4588453c5
+=======
+>>>>>>> 9ffd57b3d63611a41c2bcecdb7ebfc6f95fad048
 function buildUser(overrides) {
   return {
     id: faker.datatype.uuid(),
@@ -100,6 +109,7 @@ function buildUser(overrides) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 8601780b88f7a22f13904b6d2368f8650ebbc846
 =======
 >>>>>>> e7ce8cf894b2339a75ac4832f6c9be0ad2920f26
@@ -109,6 +119,8 @@ function buildUser(overrides) {
 >>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 =======
 >>>>>>> 0d8934af4e1a572a9d810768b57f69f4588453c5
+=======
+>>>>>>> 9ffd57b3d63611a41c2bcecdb7ebfc6f95fad048
 const waitForLoadingToFinish = () =>
   waitForElementToBeRemoved(
     () => [
@@ -118,6 +130,7 @@ const waitForLoadingToFinish = () =>
     {timeout: 4000},
   )
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -144,10 +157,15 @@ test('can login and use the book search', async () => {
 test('can login and use the book search', async () => {
   // setup
 >>>>>>> 0d8934af4e1a572a9d810768b57f69f4588453c5
+=======
+test('can login and use the book search', async () => {
+  // setup
+>>>>>>> 9ffd57b3d63611a41c2bcecdb7ebfc6f95fad048
   const root = document.createElement('div')
   root.id = 'root'
   document.body.append(root)
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -220,11 +238,14 @@ ${prettyDOM(cssEl)}
 =======
 =======
 >>>>>>> cb4f21cd9dda877b96f598ff2b17b79364e25b30
+=======
+>>>>>>> 9ffd57b3d63611a41c2bcecdb7ebfc6f95fad048
   let rootRef
   act(() => {
     rootRef = require('..').rootRef
   })
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   const user = buildUser()
 
@@ -236,11 +257,14 @@ ${prettyDOM(cssEl)}
 >>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 =======
 >>>>>>> 0d8934af4e1a572a9d810768b57f69f4588453c5
+=======
+>>>>>>> 9ffd57b3d63611a41c2bcecdb7ebfc6f95fad048
   await waitForLoadingToFinish()
 
   const user = buildUser()
 
   await userEvent.click(screen.getByRole('button', {name: /register/i}))
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -251,6 +275,8 @@ ${prettyDOM(cssEl)}
 >>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 =======
 >>>>>>> 0d8934af4e1a572a9d810768b57f69f4588453c5
+=======
+>>>>>>> 9ffd57b3d63611a41c2bcecdb7ebfc6f95fad048
 
   const modal = within(screen.getByRole('dialog'))
   await userEvent.type(modal.getByLabelText(/username/i), user.username)
@@ -260,6 +286,7 @@ ${prettyDOM(cssEl)}
 
   await waitForLoadingToFinish()
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -281,6 +308,8 @@ ${prettyDOM(cssEl)}
 >>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 =======
 >>>>>>> 0d8934af4e1a572a9d810768b57f69f4588453c5
+=======
+>>>>>>> 9ffd57b3d63611a41c2bcecdb7ebfc6f95fad048
   await userEvent.click(screen.getAllByRole('link', {name: /discover/i})[0])
 
   const searchInput = screen.getByPlaceholderText(/search/i)
@@ -288,11 +317,14 @@ ${prettyDOM(cssEl)}
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> cb4f21cd9dda877b96f598ff2b17b79364e25b30
 =======
 >>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 =======
 >>>>>>> 0d8934af4e1a572a9d810768b57f69f4588453c5
+=======
+>>>>>>> 9ffd57b3d63611a41c2bcecdb7ebfc6f95fad048
   await waitForLoadingToFinish()
 
   await userEvent.click(screen.getByText(/voice of war/i))
@@ -314,6 +346,7 @@ ${prettyDOM(cssEl)}
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> e7ce8cf894b2339a75ac4832f6c9be0ad2920f26
 =======
 >>>>>>> cb4f21cd9dda877b96f598ff2b17b79364e25b30
@@ -321,5 +354,7 @@ ${prettyDOM(cssEl)}
 >>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 =======
 >>>>>>> 0d8934af4e1a572a9d810768b57f69f4588453c5
+=======
+>>>>>>> 9ffd57b3d63611a41c2bcecdb7ebfc6f95fad048
   document.body.removeChild(root)
 })

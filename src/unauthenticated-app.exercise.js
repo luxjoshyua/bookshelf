@@ -2,9 +2,8 @@
 import {jsx} from '@emotion/core'
 
 import * as React from 'react'
-
 import {Input, Button, Spinner, FormGroup, ErrorMessage} from './components/lib'
-import {Modal, ModalOpenButton, ModalContents} from './components/modal'
+import {Modal, ModalContents, ModalOpenButton} from './components/modal'
 import {Logo} from './components/logo'
 import {useAuth} from './context/auth-context'
 import {useAsync} from './utils/hooks'
@@ -82,28 +81,25 @@ function UnauthenticatedApp() {
           gridGap: '0.75rem',
         }}
       >
-        {/* login modal */}
         <Modal>
           <ModalOpenButton>
             <Button variant="primary">Login</Button>
           </ModalOpenButton>
-          <ModalContents title="Login" aria-label="Login form">
+          <ModalContents aria-label="Login form" title="Login">
             <LoginForm
               onSubmit={login}
               submitButton={<Button variant="primary">Login</Button>}
             />
           </ModalContents>
         </Modal>
-
-        {/* register modal */}
         <Modal>
           <ModalOpenButton>
             <Button variant="secondary">Register</Button>
           </ModalOpenButton>
-          <ModalContents title="Register" aria-label="Registration form">
+          <ModalContents aria-label="Registration form" title="Register">
             <LoginForm
               onSubmit={register}
-              submitButton={<Button variant="primary">Register</Button>}
+              submitButton={<Button variant="secondary">Register</Button>}
             />
           </ModalContents>
         </Modal>
@@ -112,4 +108,10 @@ function UnauthenticatedApp() {
   )
 }
 
-export {UnauthenticatedApp}
+// 🐨 change this to a default export
+// export {UnauthenticatedApp}
+export default UnauthenticatedApp
+
+// 🐨 Unfortunately, to make this work for our workshop,
+// you need to add this to src/unauthenticated-app.js:
+// export {default} from './unauthenticated-app.exercise'

@@ -1,96 +1,27 @@
-/** @jsx jsx */
-import {jsx} from '@emotion/core'
-<<<<<<< HEAD
-
 import * as React from 'react'
-import * as auth from 'auth-provider'
-import {BrowserRouter as Router} from 'react-router-dom'
-import {queryCache} from 'react-query'
-import {FullPageSpinner} from './components/lib'
-import * as colors from './styles/colors'
-import {client} from './utils/api-client'
-import {useAsync} from './utils/hooks'
-import {AuthenticatedApp} from './authenticated-app'
-import {UnauthenticatedApp} from './unauthenticated-app'
-
-async function getUser() {
-  let user = null
-
-  const token = await auth.getToken()
-  if (token) {
-    const data = await client('me', {token})
-    user = data.user
-  }
-
-  return user
-}
-
-function App() {
-  const {
-    data: user,
-    error,
-    isLoading,
-    isIdle,
-    isError,
-    isSuccess,
-    run,
-    setData,
-  } = useAsync()
-
-  React.useEffect(() => {
-    run(getUser())
-  }, [run])
-
-  const login = form => auth.login(form).then(user => setData(user))
-  const register = form => auth.register(form).then(user => setData(user))
-  const logout = () => {
-    auth.logout()
-    queryCache.clear()
-    setData(null)
-  }
-
-  if (isLoading || isIdle) {
-    return <FullPageSpinner />
-  }
-
-  if (isError) {
-    return (
-      <div
-        css={{
-          color: colors.danger,
-          height: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <p>Uh oh... There's a problem. Try refreshing the app.</p>
-        <pre>{error.message}</pre>
-      </div>
-    )
-  }
-
-  if (isSuccess) {
-    const props = {user, login, register, logout}
-    return user ? (
-      <Router>
-        <AuthenticatedApp {...props} />
-      </Router>
-    ) : (
-      <UnauthenticatedApp {...props} />
-    )
-  }
-=======
 import {useAuth} from './context/auth-context'
-import {AuthenticatedApp} from './authenticated-app'
-import {UnauthenticatedApp} from './unauthenticated-app'
+import {FullPageSpinner} from './components/lib'
+
+// swapped from static to dyanmic component imports
+// prefetch the authenticated app module using webpack magic comments
+// because when the user lands on the login screen, it's likely we'll want to
+// load the regular app, so it's good to reduce the time it takes to render
+// the authenticated app
+// ref: https://webpack.js.org/api/module-methods/#magic-comments
+const AuthenticatedApp = React.lazy(() =>
+  import(/* webpackPrefetch: true */ './authenticated-app'),
+)
+const UnauthenticatedApp = React.lazy(() => import('./unauthenticated-app'))
 
 function App() {
   const {user} = useAuth()
 
-  return user ? <AuthenticatedApp /> : <UnauthenticatedApp />
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
+  return (
+    // ref: https://github.com/facebook/react/issues/13947 - always return a <Component /> for fallback, never a function
+    <React.Suspense fallback={<FullPageSpinner />}>
+      {user ? <AuthenticatedApp /> : <UnauthenticatedApp />}
+    </React.Suspense>
+  )
 }
 
 export {App}

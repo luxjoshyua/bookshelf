@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 // export * from './unauthenticated-app.final'
 
 <<<<<<<< HEAD:src/index.extra-3.js
@@ -108,10 +109,16 @@ export * from './unauthenticated-app.exercise'
 // export * from './unauthenticated-app.extra-1'
 >>>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3:src/unauthenticated-app.js
 =======
+=======
+>>>>>>> 9ffd57b3d63611a41c2bcecdb7ebfc6f95fad048
 import {loadDevTools} from './dev-tools/load'
 import './bootstrap'
 import * as React from 'react'
 import {createRoot} from 'react-dom/client'
+<<<<<<< HEAD
+=======
+import {Profiler} from 'components/profiler'
+>>>>>>> 9ffd57b3d63611a41c2bcecdb7ebfc6f95fad048
 import {App} from './app'
 import {AppProviders} from './context'
 
@@ -121,6 +128,7 @@ export const rootRef = {}
 loadDevTools(() => {
   const root = createRoot(document.getElementById('root'))
   root.render(
+<<<<<<< HEAD
     <AppProviders>
       <App />
     </AppProviders>,
@@ -128,3 +136,13 @@ loadDevTools(() => {
   rootRef.current = root
 })
 >>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
+=======
+    <Profiler id="App Root" phases={['mount']}>
+      <AppProviders>
+        <App />
+      </AppProviders>
+    </Profiler>,
+  )
+  rootRef.current = root
+})
+>>>>>>> 9ffd57b3d63611a41c2bcecdb7ebfc6f95fad048

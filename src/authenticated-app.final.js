@@ -1,31 +1,18 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
 
-import * as React from 'react'
-<<<<<<< HEAD
-import {Routes, Route, Link} from 'react-router-dom'
-import {Button} from './components/lib'
-import * as mq from './styles/media-queries'
-import * as colors from './styles/colors'
-=======
 import {Routes, Route, Link as RouterLink, useMatch} from 'react-router-dom'
 import {ErrorBoundary} from 'react-error-boundary'
 import {Button, ErrorMessage, FullPageErrorFallback} from './components/lib'
 import * as mq from './styles/media-queries'
 import * as colors from './styles/colors'
-import {AuthContext} from './context/auth-context'
+import {useAuth} from './context/auth-context'
 import {ReadingListScreen} from './screens/reading-list'
 import {FinishedScreen} from './screens/finished'
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
 import {DiscoverBooksScreen} from './screens/discover'
 import {BookScreen} from './screens/book'
 import {NotFoundScreen} from './screens/not-found'
 
-<<<<<<< HEAD
-function AuthenticatedApp({user, logout}) {
-  return (
-    <React.Fragment>
-=======
 function ErrorFallback({error}) {
   return (
     <ErrorMessage
@@ -42,10 +29,9 @@ function ErrorFallback({error}) {
 }
 
 function AuthenticatedApp() {
-  const {user, logout} = React.useContext(AuthContext)
+  const {user, logout} = useAuth()
   return (
     <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
       <div
         css={{
           display: 'flex',
@@ -80,42 +66,16 @@ function AuthenticatedApp() {
           <Nav />
         </div>
         <main css={{width: '100%'}}>
-<<<<<<< HEAD
-          <AppRoutes user={user} />
-        </main>
-      </div>
-    </React.Fragment>
-=======
           <ErrorBoundary FallbackComponent={ErrorFallback}>
             <AppRoutes />
           </ErrorBoundary>
         </main>
       </div>
     </ErrorBoundary>
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
   )
 }
 
 function NavLink(props) {
-<<<<<<< HEAD
-  return (
-    <Link
-      css={{
-        display: 'block',
-        padding: '8px 15px 8px 10px',
-        margin: '5px 0',
-        width: '100%',
-        height: '100%',
-        color: colors.text,
-        borderRadius: '2px',
-        borderLeft: '5px solid transparent',
-        ':hover': {
-          color: colors.indigo,
-          textDecoration: 'none',
-          background: colors.gray10,
-        },
-      }}
-=======
   const match = useMatch(props.to)
   return (
     <RouterLink
@@ -145,13 +105,12 @@ function NavLink(props) {
             }
           : null,
       ]}
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
       {...props}
     />
   )
 }
 
-function Nav() {
+function Nav(params) {
   return (
     <nav
       css={{
@@ -173,15 +132,12 @@ function Nav() {
         }}
       >
         <li>
-<<<<<<< HEAD
-=======
           <NavLink to="/list">Reading List</NavLink>
         </li>
         <li>
           <NavLink to="/finished">Finished Books</NavLink>
         </li>
         <li>
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
           <NavLink to="/discover">Discover</NavLink>
         </li>
       </ul>
@@ -189,13 +145,6 @@ function Nav() {
   )
 }
 
-<<<<<<< HEAD
-function AppRoutes({user}) {
-  return (
-    <Routes>
-      <Route path="/discover" element={<DiscoverBooksScreen user={user} />} />
-      <Route path="/book/:bookId" element={<BookScreen user={user} />} />
-=======
 function AppRoutes() {
   return (
     <Routes>
@@ -203,10 +152,9 @@ function AppRoutes() {
       <Route path="/finished" element={<FinishedScreen />} />
       <Route path="/discover" element={<DiscoverBooksScreen />} />
       <Route path="/book/:bookId" element={<BookScreen />} />
->>>>>>> 546257ba3f76fa91b42bf52212d713ab8259f8b3
       <Route path="*" element={<NotFoundScreen />} />
     </Routes>
   )
 }
 
-export {AuthenticatedApp}
+export default AuthenticatedApp

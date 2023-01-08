@@ -1,12 +1,6 @@
-import * as React from 'react'
-import {useAuth} from './context/auth-context'
-import {AuthenticatedApp} from './authenticated-app'
-import {UnauthenticatedApp} from './unauthenticated-app'
+// export * from './app.final'
 
-export function App() {
-  const {user} = useAuth()
-  return user ? <AuthenticatedApp /> : <UnauthenticatedApp />
-}
+export * from './app.exercise'
 
-// 💯 colocate global providers
-// export * from './app.extra-3'
+// 💯 Prefetch the Authenticated App
+// export * from './app.extra-1'
