@@ -3,6 +3,7 @@ import {jsx} from '@emotion/core'
 
 import * as React from 'react'
 import * as auth from 'auth-provider'
+import {queryCache} from 'react-query'
 import {client} from 'utils/api-client'
 import {useAsync} from 'utils/hooks'
 import {FullPageSpinner, FullPageErrorFallback} from 'components/lib'
@@ -12,7 +13,17 @@ async function getUser() {
 
   const token = await auth.getToken()
   if (token) {
-    const data = await client('me', {token})
+    // this `bootstrap` GET endpoint
+    // sends an object with the user and the user's listItems
+    const data = await client('bootstrap', {token})
+    const {listItems} = data
+    // https://github.com/TanStack/query/tree/24bac238bb17dda042fe611ded536f7c422cdea9#querycachesetquerydata
+    // list-items is the queryKey
+    queryCache.setQueryData('list-items', listItems, {
+      // prevent react-query from attempting to update the cache by automatically
+      // assuming it's stale, rather assume it's stale at 5 seconds, then call again
+      staleTime: 5000,
+    })
     user = data.user
   }
 
@@ -21,6 +32,12 @@ async function getUser() {
 
 const AuthContext = React.createContext()
 AuthContext.displayName = 'AuthContext'
+
+// by moving this here, it means that as soon as the module is imported,
+// it will start requesting the user's data so we don't have to wait
+// until the app mounts before we kick off the request
+// = goes from 'fetch on render' to 'render while we fetch'
+const userPromise = getUser()
 
 function AuthProvider(props) {
   const {
@@ -36,7 +53,6 @@ function AuthProvider(props) {
   } = useAsync()
 
   React.useEffect(() => {
-    const userPromise = getUser()
     run(userPromise)
   }, [run])
 
@@ -53,12 +69,8 @@ function AuthProvider(props) {
     setData(null)
   }, [setData])
 
-  // create the object inside useMemo
-  // only rerender when the user changes, because that's the only managed state in the component that changes
-  // ref: https://www.makeuseof.com/javascript-react-memoization/
-  // is actually unnecessary here because the value doesn't change
   const value = React.useMemo(
-    () => ({user, login, register, logout}),
+    () => ({user, login, logout, register}),
     [login, logout, register, user],
   )
 
