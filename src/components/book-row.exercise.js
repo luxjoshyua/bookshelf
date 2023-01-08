@@ -1,11 +1,12 @@
-// export * from './book-row.final'
-
-<<<<<<< HEAD
+/** @jsx jsx */
+import {jsx} from '@emotion/core'
+import {Link} from 'react-router-dom'
 import * as mq from 'styles/media-queries'
 import * as colors from 'styles/colors'
 
 function BookRow({book}) {
   const {title, author, coverImageUrl} = book
+
   const id = `book-row-book-${book.id}`
 
   return (
@@ -17,7 +18,8 @@ function BookRow({book}) {
         position: 'relative',
       }}
     >
-      <div
+      <Link
+        to={`/book/${book.id}`}
         aria-labelledby={id}
         css={{
           minHeight: 270,
@@ -81,12 +83,9 @@ function BookRow({book}) {
             {book.synopsis.substring(0, 500)}...
           </small>
         </div>
-      </div>
+      </Link>
     </div>
   )
 }
 
 export {BookRow}
-=======
-export * from './book-row.exercise'
->>>>>>> e7ce8cf894b2339a75ac4832f6c9be0ad2920f26

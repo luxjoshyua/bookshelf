@@ -3,19 +3,22 @@ import {jsx} from '@emotion/core'
 
 import * as React from 'react'
 import * as auth from 'auth-provider'
+// react-router-dom exposes a context provider that all the React Router
+// components use to implicitly access the router data. We need to wrap
+// our Authenticated App in the router
+import {BrowserRouter} from 'react-router-dom'
+import {FullPageSpinner} from './components/lib'
+import * as colors from './styles/colors'
+import {client} from './utils/api-client'
+import {useAsync} from './utils/hooks'
 import {AuthenticatedApp} from './authenticated-app'
 import {UnauthenticatedApp} from './unauthenticated-app'
-import {client} from 'utils/api-client.extra-4'
-import {useAsync} from 'utils/hooks'
-import {FullPageSpinner} from 'components/lib'
-import * as colors from './styles/colors'
 
-const getUser = async () => {
+async function getUser() {
   let user = null
-  const token = await auth.getToken()
 
+  const token = await auth.getToken()
   if (token) {
-    // we're logged in, so let's go get the user's data
     const data = await client('me', {token})
     user = data.user
   }
@@ -24,34 +27,23 @@ const getUser = async () => {
 }
 
 function App() {
-  // set state for the user
-  // const [user, setUser] = React.useState(null)
-
   const {
     data: user,
     error,
-    isIdle,
     isLoading,
-    isSuccess,
+    isIdle,
     isError,
+    isSuccess,
     run,
     setData,
   } = useAsync()
 
   React.useEffect(() => {
-    // getUser().then(u => setUser(u))
     run(getUser())
-  }, [run]) // pass dependency so only runs once on mount
-
-  // create a login function that calls auth.login then sets the user
-  // const login = form => auth.login(form).then(u => setUser(u))
+  }, [run])
 
   const login = form => auth.login(form).then(user => setData(user))
-
-  // do the same for register
   const register = form => auth.register(form).then(user => setData(user))
-
-  // create a logout function that calls auth.logout() and sets the user to null
   const logout = () => {
     auth.logout()
     setData(null)
@@ -80,19 +72,15 @@ function App() {
   }
 
   if (isSuccess) {
+    const props = {user, login, register, logout}
     return user ? (
-      // if there's a user, then render the AuthenticatedApp with the user and logout,
-      <AuthenticatedApp user={user} logout={logout} />
+      <BrowserRouter>
+        <AuthenticatedApp {...props} />
+      </BrowserRouter>
     ) : (
-      // if not, render UnauthenticatedApp with the login and register
-      <UnauthenticatedApp login={login} register={register} />
+      <UnauthenticatedApp {...props} />
     )
   }
 }
 
 export {App}
-
-/*
-eslint
-  no-unused-vars: "off",
-*/

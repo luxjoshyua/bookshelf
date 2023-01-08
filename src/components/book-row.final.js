@@ -1,11 +1,13 @@
-// export * from './book-row.final'
+/** @jsx jsx */
+import {jsx} from '@emotion/core'
 
-<<<<<<< HEAD
+import {Link} from 'react-router-dom'
 import * as mq from 'styles/media-queries'
 import * as colors from 'styles/colors'
 
 function BookRow({book}) {
   const {title, author, coverImageUrl} = book
+
   const id = `book-row-book-${book.id}`
 
   return (
@@ -17,14 +19,15 @@ function BookRow({book}) {
         position: 'relative',
       }}
     >
-      <div
+      <Link
         aria-labelledby={id}
+        to={`/book/${book.id}`}
         css={{
           minHeight: 270,
           flexGrow: 2,
           display: 'grid',
           gridTemplateColumns: '140px 1fr',
-          gridGap: 30,
+          gridGap: 20,
           border: `1px solid ${colors.gray20}`,
           color: colors.text,
           padding: '1.25em',
@@ -81,12 +84,9 @@ function BookRow({book}) {
             {book.synopsis.substring(0, 500)}...
           </small>
         </div>
-      </div>
+      </Link>
     </div>
   )
 }
 
 export {BookRow}
-=======
-export * from './book-row.exercise'
->>>>>>> e7ce8cf894b2339a75ac4832f6c9be0ad2920f26
