@@ -1,17 +1,24 @@
+import {queryCache} from 'react-query'
 import {server, rest} from 'test/server'
 // grab the client
 import {client} from '../api-client' // client is async so all our functions need to be async
+import * as auth from 'auth-provider'
 
 const apiURL = process.env.REACT_APP_API_URL
 
-// beforeAll, start the server
-beforeAll(() => server.listen())
+// mock our two functions
+// turns all the functions these two modules expose into mock functions
+jest.mock('react-query')
+jest.mock('auth-provider')
 
-// afterAll, stop the server
-afterAll(() => server.close())
+// // beforeAll, start the server
+// beforeAll(() => server.listen())
 
-// afterEach test, reset the server handlers to their original handlers so between each test, we reset the server handlers
-afterEach(() => server.resetHandlers())
+// // afterAll, stop the server
+// afterAll(() => server.close())
+
+// // afterEach test, reset the server handlers to their original handlers so between each test, we reset the server handlers
+// afterEach(() => server.resetHandlers())
 
 test('calls fetch at the endpoint with the arguments for GET requests', async () => {
   // add a server handler to handle a test request we'll be making
@@ -128,4 +135,31 @@ test('correctly rejects the promise if there is an error', async () => {
   // the response.ok is now false because the status is outside 200-299. so check the promise is rejected
   // with the data returned from the server
   await expect(client(endpoint)).rejects.toEqual(testErrorMessage)
+})
+
+test('correctly logs the user out if there is a 401', async () => {
+  // add a server handler to handle a test request we'll be making
+  const endpoint = 'test-endpoint'
+  const mockResult = {mockValue: 'TEST VALUE'}
+  server.use(
+    rest.get(`${apiURL}/${endpoint}`, async (req, res, ctx) => {
+      // make the response send back a 401 status code
+      return res(ctx.status(401), ctx.json(mockResult))
+    }),
+  )
+  // call the client (remember it's asynchronous)
+  // catches the error, turns it into a resolved promise
+  const result = await client(endpoint).catch(e => e)
+
+  // the message is set in ../api-client
+  // works, but toMatchInlineSnapshot below is more specific
+  // ref: https://jestjs.io/docs/snapshot-testing
+  // expect(result.message).toEqual('Please re-authenticate.')
+  expect(result.message).toMatchInlineSnapshot(`"Please re-authenticate."`)
+
+  // check queryCache.clear is called one times
+  expect(queryCache.clear).toHaveBeenCalledTimes(1)
+
+  // check auth.logout is called one times
+  expect(auth.logout).toHaveBeenCalledTimes(1)
 })
