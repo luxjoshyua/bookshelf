@@ -1,19 +1,3 @@
-<<<<<<< HEAD
-import * as React from 'react'
-import {createRoot} from 'react-dom/client'
-import {Logo} from './components/logo'
-
-function App() {
-  return (
-    <div>
-      <Logo width="80" height="80" />
-      <h1>Bookshelf</h1>
-      <div>
-        <button onClick={() => alert('login clicked')}>Login</button>
-      </div>
-      <div>
-        <button onClick={() => alert('register clicked')}>Register</button>
-=======
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
 
@@ -21,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap-reboot.css'
 import '@reach/dialog/styles.css'
 import * as React from 'react'
 import {createRoot} from 'react-dom/client'
-import {Button, Input, FormGroup} from './components/lib'
+import {Button, Input, FormGroup, Spinner} from './components/lib'
 import {Modal, ModalContents, ModalOpenButton} from './components/modal'
 import {Logo} from './components/logo'
 
@@ -58,7 +42,10 @@ function LoginForm({onSubmit, submitButton}) {
         <label htmlFor="password">Password</label>
         <Input id="password" type="password" />
       </FormGroup>
-      <div>{React.cloneElement(submitButton, {type: 'submit'})}</div>
+      <div>
+        {React.cloneElement(submitButton, {type: 'submit'})}
+        <Spinner css={{marginLeft: 5}} />
+      </div>
     </form>
   )
 }
@@ -114,7 +101,6 @@ function App() {
             />
           </ModalContents>
         </Modal>
->>>>>>> ef80adb8ec75d25a42e6caf4065c62d0c4360881
       </div>
     </div>
   )
