@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-import * as React from 'react'
-
-const AuthContext = React.createContext()
-
-export {AuthContext}
-=======
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
 
@@ -61,12 +54,10 @@ function AuthProvider(props) {
     setData(null)
   }, [setData])
 
-  const value = React.useMemo(() => ({user, login, logout, register}), [
-    login,
-    logout,
-    register,
-    user,
-  ])
+  const value = React.useMemo(
+    () => ({user, login, logout, register}),
+    [login, logout, register, user],
+  )
 
   if (isLoading || isIdle) {
     return <FullPageSpinner />
@@ -102,4 +93,3 @@ function useClient() {
 }
 
 export {AuthProvider, useAuth, useClient}
->>>>>>> 99c0a057f628883ddab148a09133fa560e4ad4a9

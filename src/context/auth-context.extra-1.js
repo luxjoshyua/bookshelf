@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-import * as React from 'react'
-
-const AuthContext = React.createContext()
-=======
 /** @jsx jsx */
 import {jsx} from '@emotion/core'
 
@@ -67,12 +62,10 @@ function AuthProvider(props) {
     setData(null)
   }, [setData])
 
-  const value = React.useMemo(() => ({user, login, logout, register}), [
-    login,
-    logout,
-    register,
-    user,
-  ])
+  const value = React.useMemo(
+    () => ({user, login, logout, register}),
+    [login, logout, register, user],
+  )
 
   if (isLoading || isIdle) {
     return <FullPageSpinner />
@@ -88,23 +81,15 @@ function AuthProvider(props) {
 
   throw new Error(`Unhandled status: ${status}`)
 }
->>>>>>> 99c0a057f628883ddab148a09133fa560e4ad4a9
 
 function useAuth() {
   const context = React.useContext(AuthContext)
   if (context === undefined) {
-<<<<<<< HEAD
-    throw new Error(`useAuth must be used within a AuthContext provider`)
-=======
     throw new Error(`useAuth must be used within a AuthProvider`)
->>>>>>> 99c0a057f628883ddab148a09133fa560e4ad4a9
   }
   return context
 }
 
-<<<<<<< HEAD
-export {AuthContext, useAuth}
-=======
 function useClient() {
   const {
     user: {token},
@@ -116,4 +101,3 @@ function useClient() {
 }
 
 export {AuthProvider, useAuth, useClient}
->>>>>>> 99c0a057f628883ddab148a09133fa560e4ad4a9
