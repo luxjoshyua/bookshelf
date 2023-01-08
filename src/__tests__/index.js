@@ -2,6 +2,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import {screen, act} from '@testing-library/react'
 =======
 import chalk from 'chalk'
@@ -30,6 +31,9 @@ import userEvent from '@testing-library/user-event'
 =======
 =======
 >>>>>>> e7ce8cf894b2339a75ac4832f6c9be0ad2920f26
+=======
+import ReactDOM from 'react-dom'
+>>>>>>> cb4f21cd9dda877b96f598ff2b17b79364e25b30
 import '@testing-library/jest-dom/extend-expect'
 import {
   screen,
@@ -40,9 +44,12 @@ import {
 import userEvent from '@testing-library/user-event'
 import faker from 'faker'
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 8601780b88f7a22f13904b6d2368f8650ebbc846
 =======
 >>>>>>> e7ce8cf894b2339a75ac4832f6c9be0ad2920f26
+=======
+>>>>>>> cb4f21cd9dda877b96f598ff2b17b79364e25b30
 import {server} from 'test/server'
 
 // enable API mocking in test runs using the same request handlers
@@ -56,9 +63,12 @@ jest.setTimeout(25000)
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> e7ce8cf894b2339a75ac4832f6c9be0ad2920f26
+=======
+>>>>>>> cb4f21cd9dda877b96f598ff2b17b79364e25b30
 function buildUser(overrides) {
   return {
     id: faker.datatype.uuid(),
@@ -69,9 +79,12 @@ function buildUser(overrides) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 8601780b88f7a22f13904b6d2368f8650ebbc846
 =======
 >>>>>>> e7ce8cf894b2339a75ac4832f6c9be0ad2920f26
+=======
+>>>>>>> cb4f21cd9dda877b96f598ff2b17b79364e25b30
 const waitForLoadingToFinish = () =>
   waitForElementToBeRemoved(
     () => [
@@ -83,6 +96,7 @@ const waitForLoadingToFinish = () =>
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 test('renders the app', async () => {
 >>>>>>> 2c0c72fa461530fdfa281fa46911582830382045
 =======
@@ -92,10 +106,15 @@ test('can login and use the book search', async () => {
 test('can login and use the book search', async () => {
   // setup
 >>>>>>> e7ce8cf894b2339a75ac4832f6c9be0ad2920f26
+=======
+test('can login and use the book search', async () => {
+  // setup
+>>>>>>> cb4f21cd9dda877b96f598ff2b17b79364e25b30
   const root = document.createElement('div')
   root.id = 'root'
   document.body.append(root)
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -157,21 +176,29 @@ ${prettyDOM(cssEl)}
   act(() => rootRef.current.unmount())
 >>>>>>> 2c0c72fa461530fdfa281fa46911582830382045
 =======
+=======
+>>>>>>> cb4f21cd9dda877b96f598ff2b17b79364e25b30
   let rootRef
   act(() => {
     rootRef = require('..').rootRef
   })
 
+<<<<<<< HEAD
   const user = buildUser()
 
   await userEvent.click(await screen.findByRole('button', {name: /register/i}))
 =======
+=======
+>>>>>>> cb4f21cd9dda877b96f598ff2b17b79364e25b30
   await waitForLoadingToFinish()
 
   const user = buildUser()
 
   await userEvent.click(screen.getByRole('button', {name: /register/i}))
+<<<<<<< HEAD
 >>>>>>> e7ce8cf894b2339a75ac4832f6c9be0ad2920f26
+=======
+>>>>>>> cb4f21cd9dda877b96f598ff2b17b79364e25b30
 
   const modal = within(screen.getByRole('dialog'))
   await userEvent.type(modal.getByLabelText(/username/i), user.username)
@@ -181,6 +208,7 @@ ${prettyDOM(cssEl)}
 
   await waitForLoadingToFinish()
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   await userEvent.click(screen.getByRole('button', {name: /logout/i}))
 
@@ -194,6 +222,13 @@ ${prettyDOM(cssEl)}
   await userEvent.type(searchInput, 'voice of war')
 
   await userEvent.click(screen.getByLabelText(/search/i))
+=======
+  await userEvent.click(screen.getAllByRole('link', {name: /discover/i})[0])
+
+  const searchInput = screen.getByPlaceholderText(/search/i)
+  await userEvent.type(searchInput, 'voice of war{enter}')
+
+>>>>>>> cb4f21cd9dda877b96f598ff2b17b79364e25b30
   await waitForLoadingToFinish()
 
   await userEvent.click(screen.getByText(/voice of war/i))
@@ -212,6 +247,9 @@ ${prettyDOM(cssEl)}
 
   // cleanup
   act(() => rootRef.current.unmount())
+<<<<<<< HEAD
 >>>>>>> e7ce8cf894b2339a75ac4832f6c9be0ad2920f26
+=======
+>>>>>>> cb4f21cd9dda877b96f598ff2b17b79364e25b30
   document.body.removeChild(root)
 })

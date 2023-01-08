@@ -1,6 +1,4 @@
 // export * from './book-row.final'
-
-<<<<<<< HEAD
 import * as mq from 'styles/media-queries'
 import * as colors from 'styles/colors'
 
@@ -87,6 +85,3 @@ function BookRow({book}) {
 }
 
 export {BookRow}
-=======
-export * from './book-row.exercise'
->>>>>>> e7ce8cf894b2339a75ac4832f6c9be0ad2920f26

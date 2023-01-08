@@ -2,7 +2,7 @@
 import {jsx} from '@emotion/core'
 
 import {Link} from 'react-router-dom'
-import {useListItem} from 'utils/list-items.exercise'
+import {useListItem} from 'utils/list-items'
 import * as mq from 'styles/media-queries'
 import * as colors from 'styles/colors'
 import {StatusButtons} from './status-buttons'
@@ -10,7 +10,9 @@ import {Rating} from './rating'
 
 function BookRow({user, book}) {
   const {title, author, coverImageUrl} = book
+
   const listItem = useListItem(user, book.id)
+
   const id = `book-row-book-${book.id}`
 
   return (
@@ -30,7 +32,7 @@ function BookRow({user, book}) {
           flexGrow: 2,
           display: 'grid',
           gridTemplateColumns: '140px 1fr',
-          gridGap: 30,
+          gridGap: 20,
           border: `1px solid ${colors.gray20}`,
           color: colors.text,
           padding: '1.25em',

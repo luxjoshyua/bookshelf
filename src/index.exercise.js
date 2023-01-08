@@ -1,131 +1,36 @@
-/** @jsx jsx */
-import {jsx} from '@emotion/core'
+import {loadDevTools} from './dev-tools/load'
+import './bootstrap'
 import * as React from 'react'
-import 'bootstrap/dist/css/bootstrap-reboot.css'
-import '@reach/dialog/styles.css'
 import {createRoot} from 'react-dom/client'
-import {Button, Input, FormGroup, Spinner} from './components/lib'
-import {Modal, ModalContents, ModalOpenButton} from './components/modal'
-import {Logo} from './components/logo'
+import {App} from './app'
+import {ReactQueryConfigProvider} from 'react-query'
 
-function LoginForm({onSubmit, submitButton}) {
-  function handleSubmit(event) {
-    event.preventDefault()
-    const {username, password} = event.target.elements
-
-    onSubmit({
-      username: username.value,
-      password: password.value,
-    })
-  }
-
-  return (
-    <form
-      onSubmit={handleSubmit}
-      css={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'stretch',
-        '> div': {
-          margin: '10px auto',
-          width: '100%',
-          maxWidth: '300px',
-        },
-      }}
-    >
-      <FormGroup>
-        <label htmlFor="username">Username</label>
-        <Input id="username" />
-      </FormGroup>
-      <FormGroup>
-        <label htmlFor="password">Password</label>
-        <Input id="password" type="password" />
-      </FormGroup>
-      <div
-        css={{
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
-        {React.cloneElement(submitButton, {type: 'submit'})}
-        <Spinner
-          css={{
-            marginLeft: '5px',
-          }}
-        />
-      </div>
-    </form>
-  )
+// set up config for react-query
+// https://github.com/TanStack/query/blob/2.x/docs/src/pages/docs/api.md#reactqueryconfigprovider
+const queryConfig = {
+  queries: {
+    // global query config here
+    useErrorBoundary: true,
+    refetchOnWindowFocus: false, // don't refetch data on window refocus
+    retry(failureCount, error) {
+      // only retry if the error status is 404 or if the failure count is greater than 2
+      // return failureCount > 2 || error.status === 404 ? false : true
+      if (error.status === 404) return false
+      else if (failureCount < 2) return true
+      else return false // neither is true so return false
+    },
+  },
 }
 
-function App() {
-  function login(formData) {
-    console.log('login', formData)
-  }
-
-  function register(formData) {
-    console.log('register', formData)
-  }
-
-  return (
-    <div
-      css={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100vh',
-      }}
-    >
-      <Logo width="80" height="80" />
-      <h1>Bookshelf</h1>
-      <div
-        css={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-          gridGap: '0.75rem',
-        }}
-      >
-        <Modal>
-          <ModalOpenButton>
-            <Button variant="primary" role="button">
-              Login
-            </Button>
-          </ModalOpenButton>
-          <ModalContents aria-label="Login form" title="Login">
-            <LoginForm
-              onSubmit={login}
-              submitButton={
-                <Button variant="primary" role="button">
-                  Login
-                </Button>
-              }
-            />
-          </ModalContents>
-        </Modal>
-        <Modal>
-          <ModalOpenButton>
-            <Button variant="secondary" role="button">
-              Register
-            </Button>
-          </ModalOpenButton>
-          <ModalContents aria-label="Registration form" title="Register">
-            <LoginForm
-              onSubmit={register}
-              submitButton={
-                <Button variant="secondary" role="button">
-                  Register
-                </Button>
-              }
-            />
-          </ModalContents>
-        </Modal>
-      </div>
-    </div>
+// ignore the rootRef in this file. I'm just doing it here to make
+// the tests I write to check your work easier.
+export const rootRef = {}
+loadDevTools(() => {
+  const root = createRoot(document.getElementById('root'))
+  root.render(
+    <ReactQueryConfigProvider config={queryConfig}>
+      <App />
+    </ReactQueryConfigProvider>,
   )
-}
-
-const root = createRoot(document.getElementById('root'))
-root.render(<App />)
-export {root}
+  rootRef.current = root
+})

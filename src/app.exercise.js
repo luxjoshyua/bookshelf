@@ -3,10 +3,8 @@ import {jsx} from '@emotion/core'
 
 import * as React from 'react'
 import * as auth from 'auth-provider'
-// react-router-dom exposes a context provider that all the React Router
-// components use to implicitly access the router data. We need to wrap
-// our Authenticated App in the router
-import {BrowserRouter} from 'react-router-dom'
+import {BrowserRouter as Router} from 'react-router-dom'
+import {queryCache} from 'react-query'
 import {FullPageSpinner} from './components/lib'
 import * as colors from './styles/colors'
 import {client} from './utils/api-client'
@@ -46,6 +44,7 @@ function App() {
   const register = form => auth.register(form).then(user => setData(user))
   const logout = () => {
     auth.logout()
+    queryCache.clear()
     setData(null)
   }
 
@@ -74,9 +73,9 @@ function App() {
   if (isSuccess) {
     const props = {user, login, register, logout}
     return user ? (
-      <BrowserRouter>
+      <Router>
         <AuthenticatedApp {...props} />
-      </BrowserRouter>
+      </Router>
     ) : (
       <UnauthenticatedApp {...props} />
     )
