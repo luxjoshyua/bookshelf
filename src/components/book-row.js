@@ -6,7 +6,6 @@ import * as colors from 'styles/colors'
 
 function BookRow({book}) {
   const {title, author, coverImageUrl} = book
-
   const id = `book-row-book-${book.id}`
 
   return (

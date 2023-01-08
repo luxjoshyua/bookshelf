@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import {screen, act} from '@testing-library/react'
 =======
 import chalk from 'chalk'
@@ -25,6 +26,17 @@ test('renders the app', () => {
 import '@testing-library/jest-dom/extend-expect'
 import {screen, waitForElementToBeRemoved, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+=======
+import '@testing-library/jest-dom/extend-expect'
+import {
+  screen,
+  waitForElementToBeRemoved,
+  within,
+  act,
+} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import faker from 'faker'
+>>>>>>> 8601780b88f7a22f13904b6d2368f8650ebbc846
 import {server} from 'test/server'
 
 // enable API mocking in test runs using the same request handlers
@@ -36,6 +48,18 @@ afterEach(() => server.resetHandlers())
 // this is a pretty comprehensive test and CI is pretty slow...
 jest.setTimeout(25000)
 
+<<<<<<< HEAD
+=======
+function buildUser(overrides) {
+  return {
+    id: faker.datatype.uuid(),
+    username: faker.internet.userName(),
+    password: faker.internet.password(),
+    ...overrides,
+  }
+}
+
+>>>>>>> 8601780b88f7a22f13904b6d2368f8650ebbc846
 const waitForLoadingToFinish = () =>
   waitForElementToBeRemoved(
     () => [
@@ -45,12 +69,17 @@ const waitForLoadingToFinish = () =>
     {timeout: 4000},
   )
 
+<<<<<<< HEAD
 test('renders the app', async () => {
 >>>>>>> 2c0c72fa461530fdfa281fa46911582830382045
+=======
+test('can login and use the book search', async () => {
+>>>>>>> 8601780b88f7a22f13904b6d2368f8650ebbc846
   const root = document.createElement('div')
   root.id = 'root'
   document.body.append(root)
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   let reactRoot
   act(() => {
@@ -106,5 +135,28 @@ ${prettyDOM(cssEl)}
   // cleanup
   act(() => rootRef.current.unmount())
 >>>>>>> 2c0c72fa461530fdfa281fa46911582830382045
+=======
+  let rootRef
+  act(() => {
+    rootRef = require('..').rootRef
+  })
+
+  const user = buildUser()
+
+  await userEvent.click(await screen.findByRole('button', {name: /register/i}))
+
+  const modal = within(screen.getByRole('dialog'))
+  await userEvent.type(modal.getByLabelText(/username/i), user.username)
+  await userEvent.type(modal.getByLabelText(/password/i), user.password)
+
+  await userEvent.click(modal.getByRole('button', {name: /register/i}))
+
+  await waitForLoadingToFinish()
+
+  await userEvent.click(screen.getByRole('button', {name: /logout/i}))
+
+  // cleanup
+  act(() => rootRef.current.unmount())
+>>>>>>> 8601780b88f7a22f13904b6d2368f8650ebbc846
   document.body.removeChild(root)
 })
