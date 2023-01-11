@@ -147,8 +147,18 @@ test('can specify an initial state', async () => {
   })
 })
 
-test.todo('can set the data')
-// 💰 result.current.setData('whatever you want')
+test('can set the data', async () => {
+  // result.current.setData('whatever you want')
+  const mockData = Symbol('resolved value')
+  const {result} = renderHook(() => useAsync())
+  act(() => {
+    result.current.setData(mockData)
+  })
+  expect(result.current).toEqual({
+    ...resolvedState,
+    data: mockData,
+  })
+})
 
 test.todo('can set the error')
 // 💰 result.current.setError('whatever you want')
