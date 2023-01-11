@@ -137,7 +137,14 @@ test('calling run with a promise which rejects', async () => {
 })
 
 test('can specify an initial state', async () => {
-  // 💰 useAsync(customInitialState)
+  // useAsync(customInitialState)
+  const mockData = Symbol('resolved value')
+  const customInitialState = {status: 'resolved', data: mockData}
+  const {result} = renderHook(() => useAsync(customInitialState))
+  expect(result.current).toEqual({
+    ...resolvedState,
+    ...customInitialState,
+  })
 })
 
 test.todo('can set the data')
