@@ -2,6 +2,14 @@ import {renderHook, act} from '@testing-library/react'
 // this is the thing we're testing
 import {useAsync} from '../hooks'
 
+beforeEach(() => {
+  jest.spyOn(console, 'error')
+})
+
+afterEach(() => {
+  console.error.mockRestore()
+})
+
 // this function provides a way to create a promise which we can imperatively resolve or reject
 // whenever we want
 function deferred() {
@@ -173,8 +181,26 @@ test('can set the error', () => {
   })
 })
 
-test.todo('No state updates happen if the component is unmounted while pending')
-// 💰 const {result, unmount} = renderHook(...)
-// 🐨 ensure that console.error is not called (React will call console.error if updates happen when unmounted)
+test('No state updates happen if the component is unmounted while pending', async () => {
+  // const {result, unmount} = renderHook(...)
+  // ensure that console.error is not called (React will call console.error if updates happen when unmounted)
+  const {promise, resolve} = deferred()
+  const {result, unmount} = renderHook(() => useAsync())
+  let p
+  act(() => {
+    p = result.current.run(promise)
+  })
+  unmount()
+  await act(async () => {
+    resolve()
+    await p
+  })
+  expect(console.error).not.toHaveBeenCalled()
+})
 
-test.todo('calling "run" without a promise results in an early error')
+test('calling "run" without a promise results in an early error', () => {
+  const {result} = renderHook(() => useAsync())
+  expect(() => result.current.run()).toThrowErrorMatchingInlineSnapshot(
+    `"The argument passed to useAsync().run must be a promise. Maybe a function that's passed isn't returning anything?"`,
+  )
+})
