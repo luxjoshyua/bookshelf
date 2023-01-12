@@ -1,4 +1,4 @@
-# Unit Testing
+# Testing Hooks and Components
 
 ## 📝 Your Notes
 
@@ -6,120 +6,206 @@ Elaborate on your learnings here in `INSTRUCTIONS.md`
 
 ## Background
 
-In every application, you'll have functions that you find yourself using
-throughout the application. These types of functions are perfect for unit
-testing. Whether it's a function to format a user object to their display name,
-or a utility to compute the scroll position of an element in a list, extracting
-this complex logic to a utility function and testing it in isolation can be
-really helpful.
+The two building blocks of React applications are Hooks and Components. You can
+make a custom hook out of anything that uses another hook, and you can split a
+component into a million different slices as well. But that doesn't mean you
+should test every single one of them. Following the advice in
+[How to know what to test](https://kentcdodds.com/blog/how-to-know-what-to-test)
+and
+[Static vs Unit vs Integration vs E2E Testing for Frontend Apps](https://kentcdodds.com/blog/unit-vs-integration-vs-e2e-tests),
+we want to make sure that we're focusing our efforts in the right place and not
+testing at too low of a level unnecessarily (painting a wall with a tiny
+paintbrush or painting the corners with a bucket of paint).
 
-But it's not just "pure functions" that can benefit from unit testing. Any code
-that's heavily relied upon is a good candidate for unit testing. Keep in mind
-that not everything needs a unit test. Most of your code can be covered by good
-component/integration tests. Rather than thinking about getting all your code
-covered by unit tests, think about
-[covering your use cases](https://kentcdodds.com/blog/how-to-know-what-to-test).
+Typically, you'll get confidence that your components are working when you run
+them as part of integration tests with other components. However, highly
+reusable or complex components or hooks can really benefit from a solid suite of
+tests dedicated to them specifically. Sometimes this means that you mock some or
+all of their dependencies and other times they don't have any dependencies at
+all.
+
+You'll find that some people don't consider a test a "unit test" if it's not
+mocking out all dependencies (like React hooks or other components). Honestly,
+it really doesn't matter, so if you want to call these "Component Tests" and
+"Hooks Tests" or even "lower level Integration Tests" that's cool with me. I
+just care about getting confidence my stuff's not busted.
+
+### Testing components
+
+For testing components, we'll be using
+[React Testing Library](https://testing-library.com/react), the de-facto
+standard testing library for React and we'll use
+[`@testing-library/user-event`](https://github.com/testing-library/user-event)
+to help with our user interactions. We already have those packages installed in
+this repository. We also have
+[`@testing-library/jest-dom`](https://github.com/testing-library/jest-dom)
+installed in our `package.json` (but you'll need to make sure to enable it in
+the exercise).
+
+Here's a quick example of how to test a component with React Testing Library:
+
+```javascript
+import * as React from 'react'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {MyComponent} from '../my-component'
+
+test('renders click me button', () => {
+  render(<MyComponent />)
+  const button = screen.getByRole('button', {name: /click me/i})
+  await userEvent.click(button)
+
+  expect().toBeInTheDocument()
+})
+```
+
+> NOTE: The latest version of `userEvent` returns promises for _all_ API calls,
+> so you'll need to add `await` to any interaction you do.
+
+### Testing hooks
+
+Most of your custom hooks should be covered by testing the components that use
+them. Doing this will help avoid our natural tendency to over-abstract your
+custom hook to support things that your components don't actually need.
+
+However, sometimes a custom hook is reusable (a library) or sufficiently complex
+that testing it in isolation is a good idea. In that case you have two
+approaches:
+
+1. Create a test component that uses the hook in the typical way the hook would
+   be used by consumers and test that component
+2. `renderHook` from `@testing-library/react`
+
+Learn more about the nuances between these approaches in
+[How to test custom React hooks](https://kentcdodds.com/blog/how-to-test-custom-react-hooks).
+
+Here's an example of how you'd test a custom hook with `@testing-library/react`:
+
+```javascript
+import {renderHook, act} from '@testing-library/react'
+import useCounter from '../use-counter'
+
+test('should increment counter', () => {
+  const {result} = renderHook(() => useCounter())
+  expect(result.current.count).toBe(0)
+  act(() => {
+    result.current.increment()
+  })
+  expect(result.current.count).toBe(1)
+})
+```
+
+Learn more about that funny `act` function from
+[Fix the "not wrapped in act(...)" warning](https://kentcdodds.com/blog/fix-the-not-wrapped-in-act-warning).
 
 ## Exercise
 
 Production deploys:
 
-- [Exercise](https://exercises-11-unit-testing.bookshelf.lol/exercise)
-- [Final](https://exercises-11-unit-testing.bookshelf.lol/)
+- [Exercise](https://exercises-12-testing-hooks-and-components.bookshelf.lol/exercise)
+- [Final](https://exercises-12-testing-hooks-and-components.bookshelf.lol/)
 
-In this exercise, we've got two utilities that we're going to unit test. The
-first is a very simple `formatDate` function, and the other is the API `client`
-function.
+In this project, we have one reusable hook called `useAsync` and a set of
+compound components for modals: `Modal`, `ModalContents`, `ModalOpenButton`. For
+this exercise, you'll be adding tests for these things!
 
-The `formatDate` function (part of the `src/utils/misc.js` module) is a pure
-function and doesn't have much logic to it, start with that one to get warmed
-up.
-
-The `client` function is a bit more complicated because it makes an HTTP request
-with `window.fetch` which we don't want to actually perform in our tests.
-Luckily for us, we already have a mock server for our development using
-[`msw`](https://github.com/mswjs/msw), so we can use that same tool to have a
-mock server for our tests. This is already set up for you in the
-`src/test/server` directory. All you need to do is make sure the server is
-started before all the tests and that it's stopped after all the tests.
-
-With `msw` setup, you can now add request handlers to the server before calling
-`client`. For example:
+💰 One thing to keep in mind, we want to try and use our code in the same way we
+expect users to use them. So when testing the modal compound components, we'll
+render them all together, rather than trying to render them separately from one
+another. This is totally fine:
 
 ```javascript
-server.use(
-  rest.get(`https://bookshelf.jk/example`, async (req, res, ctx) => {
-    return res(ctx.json({some: 'Sweet json!'}))
-  }),
+render(
+  <Parent>
+    <Child1 />
+    <Child2>Hello</Child2>
+  </Parent>,
 )
-
-const response = await window.fetch(`https://bookshelf.jk/example`)
-const result = response.json()
-result.some === 'Sweet json!' // true
 ```
 
-This means that we can ensure that the client is interacting with `window.fetch`
-correctly because `window.fetch` is actually executed, the request is simply
-intercepted by `msw` so we can handle it ourselves rather than relying on a
-third party server.
+💰 For the `useAsync` hook tests, you'll be asserting on the value returned by
+the hook, that means you'll be using `toEqual({})` a fair amount. But how do you
+assert that the `run`, `reset`, `setData`, and `setError` functions are correct?
+You can't really, not without calling them (which you'll be doing throughout the
+tests). But with `toEqual`, you _have_ to include all properties. You can use
+[the `expect.any` asymetric matcher](https://jestjs.io/docs/en/expect#expectanyconstructor).
+Here's how you can do that:
+
+```javascript
+const foo = () => {}
+expect({foo}).toEqual({foo: expect.any(Function)})
+```
+
+Alternatively, you could assert using
+[`.toMatchObject()`](https://jestjs.io/docs/en/expect#tomatchobjectobject) and
+just ignore the functions. That would technically work as well. However, I
+prefer the asymetric matcher in this case because I'm able to maintain
+confidence that these functions are always included.
 
 ### Files
 
-- `src/utils/__tests__/misc.js`
-- `src/utils/__tests__/api-client.js`
+- `src/setupTests.js`
+- `src/components/__tests__/modal.js`
+- `src/utils/__tests__/use-async.js`
 
 ## Extra Credit
 
-### 1. 💯 Test failure cases
+### 1. 💯 AHA Testing
 
-[Production deploy](https://exercises-11-unit-testing.bookshelf.lol/extra-1)
+[Production deploy](https://exercises-12-testing-hooks-and-components.bookshelf.lol/extra-1)
 
-There are two use cases that our `client` supports that we should probably cover
-in our tests:
+[AHA Programming](https://kentcdodds.com/blog/aha-programming) stands for "Avoid
+Hasty Abstractions" and it suggests that you should "prefer duplication over the
+wrong abstraction" and "optimize for change first."
+[When applied to testing](https://kentcdodds.com/blog/aha-testing), it can
+seriously improve the way the tests can be understood. You can communicate what
+matters through the abstractions you write.
 
-1. If the `response.ok` is `false`, the promise is rejected with the data
-   returned from the server. This happens if the `response.status` is outside of
-   the successful range of 200-299 (📜 learn more:
-   https://developer.mozilla.org/en-US/docs/Web/API/Response/ok).
-2. If the `response.status` is `401` (Unauthorized), we log the user out and
-   clear the query cache.
+Every test for `hooks.js` is asserting on the return value of our hook, which
+includes the following properties: `status`, `data`, `error`, `isIdle`,
+`isLoading`, `isError`, `isSuccess`, `run`, `reset`, `setData`, and `setError`.
 
-To set the `status` in your `msw` request handler, you can do this:
+Including all of these problems is not only a bit of a pain, but also makes it
+harder to determine the parts that are different between assertions which makes
+it harder to understand the intent of the test. Remember, the "customer" of the
+test is developers, so you want to make it as easy for them to understand as
+possible so they can work out what's happening when a test fails.
+
+Typically you can clean up tests via helper functions or "Test Object Factory"
+functions. So we could create a function like this:
 
 ```javascript
-return res(ctx.status(400), ctx.json({message: 'this is the response!'}))
+function getAsyncState(overrides) {
+  return {
+    data: null,
+    isIdle: true,
+    isLoading: false,
+    isError: false,
+    isSuccess: false,
+
+    error: null,
+    status: 'idle',
+    run: expect.any(Function),
+    reset: expect.any(Function),
+    setData: expect.any(Function),
+    setError: expect.any(Function),
+    ...overrides,
+  }
+}
 ```
 
-For this extra credit, you'll need to write tests for both of those cases. The
-first one should be more straightforward. The second one will be a bit more
-tricky because you'll want to assert that `queryCache.clear` and `auth.logout`
-were both called.
-
-> 💰 use `jest.mock` to mock the `react-query` and `auth-provider` modules.
+You can go ahead and do that, or because the object is so simple, you could
+simply create that object and manually merge it in each assertion. Whatever you
+choose to do, implement it in the tests and observe how much it improves the
+readability of each test.
 
 **Files:**
 
-- `src/utils/__tests__/api-client.js`
-
-### 2. 💯 Use `setupTests.js`
-
-[Production deploy](https://exercises-11-unit-testing.bookshelf.lol/extra-2)
-
-Most of our tests are going to need the server to be running. Luckily for us, we
-already have jest configured to automatically require the file
-`src/setupTests.js`. (Check the `jest.config.js` file and look at the
-`setupFilesAfterEnv` config). So all we need to do now is move that setup from
-the `src/utils/__tests__/api-client.js` to the `src/setupTests.js` file and then
-all of our tests will benefit from the same setup automatically.
-
-**Files:**
-
-- `src/utils/__tests__/api-client.js`
-- `src/setupTests.js`
+- `src/utils/__tests__/use-async.js`
 
 ## 🦉 Elaboration and Feedback
 
 After the instruction, if you want to remember what you've just learned, then
 fill out the elaboration and feedback form:
 
-https://ws.kcd.im/?ws=Build%20React%20Apps&e=11%3A%20Unit%20Testing&em=
+https://ws.kcd.im/?ws=Build%20React%20Apps&e=12%3A%20Testing%20Hooks%20and%20Components&em=
