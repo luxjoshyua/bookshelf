@@ -7,6 +7,8 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  // if a test fails. still restore to origianl console errors
+  // after each test is run
   console.error.mockRestore()
 })
 
@@ -54,6 +56,7 @@ const pendingState = {
 }
 
 const resolvedState = {
+  // spread the default in, then override as needed
   ...defaultState,
   status: 'resolved',
   isIdle: false,
@@ -61,6 +64,7 @@ const resolvedState = {
 }
 
 const rejectedState = {
+  // spread the default in, then override as needed
   ...defaultState,
   status: 'rejected',
   isIdle: false,
@@ -71,9 +75,12 @@ test('calling run with a promise which resolves', async () => {
   // get a deferred promise and resolve function from the deferred utility
   const {promise, resolve} = deferred()
   // use renderHook with useAsync to get the result
-  // need to destructure this !
+  // need to destructure result from the returned object because that's the property we're working with !
+  // can only call hooks from inside React component, hence we have to use renderHook
   const {result} = renderHook(() => useAsync())
+
   // assert the result.current is the correct default state
+  // ref: https://jestjs.io/docs/expect#expectanyconstructor
   expect(result.current).toEqual(defaultState)
 
   // call `run`, passing the promise
@@ -102,6 +109,8 @@ test('calling run with a promise which resolves', async () => {
   })
 
   // call reset
+  // any hook we call that results in a state update, we need to wrap in act
+  // ref: https://kentcdodds.com/blog/fix-the-not-wrapped-in-act-warning
   act(() => {
     result.current.reset()
   })
@@ -133,7 +142,7 @@ test('calling run with a promise which rejects', async () => {
   await act(async () => {
     reject(rejectedValue)
     await p.catch(() => {
-      /* ignore error */
+      // ignore error
     })
   })
 
@@ -203,4 +212,6 @@ test('calling "run" without a promise results in an early error', () => {
   expect(() => result.current.run()).toThrowErrorMatchingInlineSnapshot(
     `"The argument passed to useAsync().run must be a promise. Maybe a function that's passed isn't returning anything?"`,
   )
+  // also works
+  // expect(() => result.current.run).toThrow()
 })
