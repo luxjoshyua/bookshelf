@@ -82,10 +82,7 @@ test('renders all the book information', async () => {
   // 🐨 use findBy to wait for the book title to appear
   // 📜 https://testing-library.com/docs/dom-testing-library/api-async#findby-queries
   // check screen isnt't still loading
-  await waitForElementToBeRemoved(() => [
-    ...screen.queryAllByLabelText(/loading/i),
-    ...screen.queryAllByText(/loading/i),
-  ])
+  await waitForElementToBeRemoved()
 
   // 🐨 assert the book's info is in the document
 })
