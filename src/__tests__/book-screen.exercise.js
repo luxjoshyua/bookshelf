@@ -1,10 +1,5 @@
 import * as React from 'react'
-import {
-  render,
-  screen,
-  waitFor,
-  waitForElementToBeRemoved,
-} from '@testing-library/react'
+import {render, screen, waitForElementToBeRemoved} from '@testing-library/react'
 import {queryCache} from 'react-query'
 import {buildUser, buildBook} from 'test/generate'
 import * as auth from 'auth-provider'
@@ -12,21 +7,21 @@ import {AppProviders} from 'context'
 import {App} from 'app'
 
 // after each test, clear the queryCache and log user out
-afterEach(() => {
+afterEach(async () => {
   queryCache.clear()
   auth.logout()
 })
 
 test('renders all the book information', async () => {
+  // create a user using `buildUser`
+  const user = buildUser()
   // authenticate the client by setting the auth.localStorageKey in localStorage
   // to some string value (can be anything for now)
   window.localStorage.setItem(auth.localStorageKey, 'WHATEVER_FAKE_TOKEN')
 
-  // create a user using `buildUser`
-  const user = buildUser()
   // create a book using `buildBook`
   const book = buildBook()
-  // update the URL to `/book/${book.id}`
+  // update the URL to `/book/${book.id}` because we need to be in that location for this test
   // window.history.pushState({}, 'page title', route)
   // ref: https://developer.mozilla.org/en-US/docs/Web/API/History/pushState
   const route = `/book/${book.id}`
@@ -36,24 +31,27 @@ test('renders all the book information', async () => {
   // window.fetch = async (url, config) => { /* handle stuff here */ }
   // return Promise.resolve({ok: true, json: async () => ({ /* response data here */ })})
   // endsWith() ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith
+  const originalFetch = window.fetch
   window.fetch = async (url, config) => {
-    if (!url) {
-      console.warn(url, config)
-      return Promise.reject(new Error(`Need to handle: ${url}`))
-    }
+    // if (!url) {
+    //   console.warn(url, config)
+    //   return Promise.reject(
+    //     new Error(`Need to handle: ${url} with config: ${config}`),
+    //   )
+    // }
     // - url ends with `/bootstrap`: respond with {user, listItems: []}
     if (url.endsWith(`/bootstrap`)) {
       return Promise.resolve({
         ok: true,
         json: async () => ({
           // response data here
-          user,
+          user: {...user, token: 'WHATEVER_FAKE_TOKEN'},
           listItems: [],
         }),
       })
     }
     // - url ends with `/list-items`: respond with {listItems: []}
-    if (url.endsWith(`list-items`)) {
+    else if (url.endsWith(`list-items`)) {
       return Promise.resolve({
         ok: true,
         json: async () => ({
@@ -63,7 +61,7 @@ test('renders all the book information', async () => {
       })
     }
     // - url ends with `/books/${book.id}`: respond with {book}
-    if (url.endsWith(`/books/${book.id}`)) {
+    else if (url.endsWith(`/books/${book.id}`)) {
       return Promise.resolve({
         ok: true,
         json: async () => ({
@@ -72,17 +70,52 @@ test('renders all the book information', async () => {
         }),
       })
     }
-    console.warn(`shouldn't be able to reach here`)
+    console.log(url, config)
+    return originalFetch(url, config)
   }
 
   // setting the wrapper to AppProviders means all the same providers
   // we have in the app will be available in our tests
   render(<App />, {wrapper: AppProviders})
 
-  // 🐨 use findBy to wait for the book title to appear
-  // 📜 https://testing-library.com/docs/dom-testing-library/api-async#findby-queries
-  // check screen isnt't still loading
-  await waitForElementToBeRemoved()
+  // check app is settled / screen isnt't still loading before we start checking if the book list is rendering properly
+  // await waitForElementToBeRemoved(() => screen.getByLabelText(/loading/i))
+  await waitForElementToBeRemoved(() => [
+    ...screen.queryAllByLabelText(/loading/i),
+    ...screen.queryAllByText(/loading/i),
+  ])
 
-  // 🐨 assert the book's info is in the document
+  // https://testing-library.com/docs/dom-testing-library/api-async#findby-queries
+  // check where we're up to
+  // screen.debug()
+  // find the available roles
+  // screen.getByRole('whatver')
+
+  // assert the book's info is in the document
+  expect(screen.getByRole('heading', {name: book.title})).toBeInTheDocument()
+  expect(screen.getByText(book.author)).toBeInTheDocument()
+  expect(screen.getByText(book.publisher)).toBeInTheDocument()
+  expect(screen.getByText(book.synopsis)).toBeInTheDocument()
+  expect(screen.getByRole('img', {name: /book cover/i})).toHaveAttribute(
+    'src',
+    book.coverImageUrl,
+  )
+  expect(screen.getByRole('button', {name: /add to list/i})).toBeInTheDocument()
+
+  // check elements aren't in the document also
+  // using getByRole will throw an error because it can't get anything
+  expect(
+    screen.queryByRole('button', {name: /remove from list/i}),
+  ).not.toBeInTheDocument()
+  expect(
+    screen.queryByRole('button', {name: /mark as read/i}),
+  ).not.toBeInTheDocument()
+  expect(
+    screen.queryByRole('button', {name: /mark as unread/i}),
+  ).not.toBeInTheDocument()
+  expect(
+    screen.queryByRole('textbox', {name: /notes/i}),
+  ).not.toBeInTheDocument()
+  expect(screen.queryByRole('radio', {name: /star/i})).not.toBeInTheDocument()
+  expect(screen.queryByLabelText(/start date/i)).not.toBeInTheDocument()
 })
