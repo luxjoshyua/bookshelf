@@ -1,5 +1,6 @@
 import * as React from 'react'
 import {render, screen, waitForElementToBeRemoved} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {queryCache} from 'react-query'
 import {buildUser, buildBook} from 'test/generate'
 import * as auth from 'auth-provider'
@@ -8,6 +9,7 @@ import {App} from 'app'
 import * as usersDB from 'test/data/users'
 import * as booksDB from 'test/data/books'
 import * as listItemsDB from 'test/data/list-items'
+import {formatDate} from 'utils/misc'
 
 // after each test, clear the queryCache and log user out
 afterEach(async () => {
@@ -27,10 +29,10 @@ test('renders all the book information', async () => {
   window.localStorage.setItem(auth.localStorageKey, authUser.token)
 
   // create a book using `buildBook`
-  // const book = buildBook()
-  // await booksDB.create(book)
+  const book = buildBook()
+  await booksDB.create(book)
   // does the same but shorter syntax
-  const book = await booksDB.create(buildBook())
+  // const book = await booksDB.create(buildBook())
 
   // update the URL to `/book/${book.id}` because we need to be in that location for this test
   // window.history.pushState({}, 'page title', route)
@@ -131,4 +133,68 @@ test('renders all the book information', async () => {
   ).not.toBeInTheDocument()
   expect(screen.queryByRole('radio', {name: /star/i})).not.toBeInTheDocument()
   expect(screen.queryByLabelText(/start date/i)).not.toBeInTheDocument()
+})
+
+// we're testing what happens when we're on the book screen
+// and we add a book to our reading list
+test('can create a list item for the book', async () => {
+  // get the app into the state we want
+  const user = buildUser()
+  await usersDB.create(user)
+  const authUser = await usersDB.authenticate(user)
+  window.localStorage.setItem(auth.localStorageKey, authUser.token)
+  const book = buildBook()
+  await booksDB.create(book)
+  const route = `/book/${book.id}`
+  window.history.pushState({}, 'page title', route)
+  render(<App />, {wrapper: AppProviders})
+
+  await waitForElementToBeRemoved(() => [
+    // spresd the result of the query into an array
+    ...screen.queryAllByLabelText(/loading/i),
+    ...screen.queryAllByText(/loading/i),
+  ])
+
+  // now at single book screen
+  // screen.debug()
+  // screen.getByRole('whakdfdf')
+
+  // click on the add to list button
+  await userEvent.click(screen.getByRole('button', {name: /add to list/i}))
+
+  // wait for the app to settle - all the loading indicators should be gone
+  await waitForElementToBeRemoved(() => [
+    // spresd the result of the query into an array
+    ...screen.queryAllByLabelText(/loading/i),
+    ...screen.queryAllByText(/loading/i),
+  ])
+
+  // screen.debug()
+  // screen.getByRole('whakdfdf')
+
+  // verify the right elements appear on the screen now that this book has a list item
+  // mark as read
+  expect(
+    screen.getByRole('button', {name: /mark as read/i}),
+  ).toBeInTheDocument()
+  // remove from list
+  expect(
+    screen.getByRole('button', {name: /remove from list/i}),
+  ).toBeInTheDocument()
+  // has date
+  // expect(screen.queryByLabelText(/start date/i)).toBeInTheDocument()
+  // notes section
+  expect(screen.getByRole('textbox', {name: /notes/i})).toBeInTheDocument()
+
+  // better has start date
+  const startDateNode = screen.getByLabelText(/start date/i)
+  expect(startDateNode).toHaveTextContent(formatDate(Date.now()))
+
+  expect(
+    screen.queryByRole('button', {name: /add to list/i}),
+  ).not.toBeInTheDocument()
+  expect(
+    screen.queryByRole('button', {name: /mark as unread/i}),
+  ).not.toBeInTheDocument()
+  expect(screen.queryByRole('radio', {name: /star/i})).not.toBeInTheDocument()
 })
