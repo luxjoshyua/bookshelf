@@ -1,36 +1,31 @@
 import * as React from 'react'
-import {render, screen, waitForElementToBeRemoved} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import {queryCache} from 'react-query'
-import {buildUser, buildBook} from 'test/generate'
-import * as auth from 'auth-provider'
-import {AppProviders} from 'context'
+import {
+  render,
+  screen,
+  waitForLoadingToFinish,
+  userEvent,
+  loginAsUser,
+} from 'test/app-test-utils'
+import {buildBook, buildListItem} from 'test/generate'
 import {App} from 'app'
-import * as usersDB from 'test/data/users'
 import * as booksDB from 'test/data/books'
 import * as listItemsDB from 'test/data/list-items'
 import {formatDate} from 'utils/misc'
 
-// after each test, clear the queryCache and log user out
-afterEach(async () => {
-  queryCache.clear()
-  auth.logout()
-  // because these aren't dependent on each other, make sure they execute at the same time
-  await Promise.all([usersDB.reset(), booksDB.reset(), listItemsDB.reset()])
-})
-
 test('renders all the book information', async () => {
   // create a user using `buildUser`
-  const user = buildUser()
-  await usersDB.create(user)
-  const authUser = await usersDB.authenticate(user)
+  // const user = buildUser()
+  // await usersDB.create(user)
+  // const authUser = await usersDB.authenticate(user)
   // authenticate the client by setting the auth.localStorageKey in localStorage
   // to the token associated with the authenticated user
-  window.localStorage.setItem(auth.localStorageKey, authUser.token)
+  // window.localStorage.setItem(auth.localStorageKey, authUser.token)
 
   // create a book using `buildBook`
-  const book = buildBook()
-  await booksDB.create(book)
+  // const book = buildBook()
+  // await booksDB.create(book)
+
+  const book = await booksDB.create(buildBook())
   // does the same but shorter syntax
   // const book = await booksDB.create(buildBook())
 
@@ -38,7 +33,7 @@ test('renders all the book information', async () => {
   // window.history.pushState({}, 'page title', route)
   // ref: https://developer.mozilla.org/en-US/docs/Web/API/History/pushState
   const route = `/book/${book.id}`
-  window.history.pushState({}, 'page title', route)
+  // window.history.pushState({}, 'page title', route)
 
   // reassign window.fetch to another function and handle the following requests
   // window.fetch = async (url, config) => { /* handle stuff here */ }
@@ -90,15 +85,15 @@ test('renders all the book information', async () => {
 
   // setting the wrapper to AppProviders means all the same providers
   // we have in the app will be available in our tests
-  render(<App />, {wrapper: AppProviders})
+  await render(<App />, {route})
 
   // check app is settled / screen isnt't still loading before we start checking if the book list is rendering properly
   // await waitForElementToBeRemoved(() => screen.getByLabelText(/loading/i))
-  await waitForElementToBeRemoved(() => [
-    // spresd the result of the query into an array
-    ...screen.queryAllByLabelText(/loading/i),
-    ...screen.queryAllByText(/loading/i),
-  ])
+  // await waitForElementToBeRemoved(() => [
+  //   // spresd the result of the query into an array
+  //   ...screen.queryAllByLabelText(/loading/i),
+  //   ...screen.queryAllByText(/loading/i),
+  // ])
 
   // https://testing-library.com/docs/dom-testing-library/api-async#findby-queries
   // check where we're up to
@@ -139,21 +134,23 @@ test('renders all the book information', async () => {
 // and we add a book to our reading list
 test('can create a list item for the book', async () => {
   // get the app into the state we want
-  const user = buildUser()
-  await usersDB.create(user)
-  const authUser = await usersDB.authenticate(user)
-  window.localStorage.setItem(auth.localStorageKey, authUser.token)
-  const book = buildBook()
-  await booksDB.create(book)
+  // const user = buildUser()
+  // await usersDB.create(user)
+  // const authUser = await usersDB.authenticate(user)
+  // window.localStorage.setItem(auth.localStorageKey, authUser.token)
+  // const book = buildBook()
+  // await booksDB.create(book)
+  const book = await booksDB.create(buildBook())
   const route = `/book/${book.id}`
-  window.history.pushState({}, 'page title', route)
-  render(<App />, {wrapper: AppProviders})
+  // window.history.pushState({}, 'page title', route)
 
-  await waitForElementToBeRemoved(() => [
-    // spresd the result of the query into an array
-    ...screen.queryAllByLabelText(/loading/i),
-    ...screen.queryAllByText(/loading/i),
-  ])
+  await render(<App />, {route})
+
+  // await waitForElementToBeRemoved(() => [
+  //   // spresd the result of the query into an array
+  //   ...screen.queryAllByLabelText(/loading/i),
+  //   ...screen.queryAllByText(/loading/i),
+  // ])
 
   // now at single book screen
   // screen.debug()
@@ -163,11 +160,12 @@ test('can create a list item for the book', async () => {
   await userEvent.click(screen.getByRole('button', {name: /add to list/i}))
 
   // wait for the app to settle - all the loading indicators should be gone
-  await waitForElementToBeRemoved(() => [
-    // spresd the result of the query into an array
-    ...screen.queryAllByLabelText(/loading/i),
-    ...screen.queryAllByText(/loading/i),
-  ])
+  // await waitForElementToBeRemoved(() => [
+  //   // spresd the result of the query into an array
+  //   ...screen.queryAllByLabelText(/loading/i),
+  //   ...screen.queryAllByText(/loading/i),
+  // ])
+  await waitForLoadingToFinish()
 
   // screen.debug()
   // screen.getByRole('whakdfdf')
@@ -197,4 +195,37 @@ test('can create a list item for the book', async () => {
     screen.queryByRole('button', {name: /mark as unread/i}),
   ).not.toBeInTheDocument()
   expect(screen.queryByRole('radio', {name: /star/i})).not.toBeInTheDocument()
+})
+
+test('can remove a list item for the book', async () => {
+  // interact directly with the database
+  // book loading up already has a user associated to it
+  // for the user who's logged in
+  const user = await loginAsUser()
+
+  const book = await booksDB.create(buildBook())
+  // associate the book with the user
+  await listItemsDB.create(buildListItem({owner: user, book}))
+
+  const route = `/book/${book.id}`
+  // render the app with the route and the user
+  await render(<App />, {route, user})
+
+  // click the remove from list button
+  const removeFromListBtn = screen.getByRole('button', {
+    name: /remove from list/i,
+  })
+  await userEvent.click(removeFromListBtn)
+  // after clicking, expect the button to be disabled
+  expect(removeFromListBtn).toBeDisabled()
+
+  // wait for loading state to finish
+  await waitForLoadingToFinish()
+
+  // expect add to list button to be in the document
+  expect(screen.getByRole('button', {name: /add to list/i})).toBeInTheDocument()
+  // expect remove from list button not to be in the document
+  expect(
+    screen.queryByRole('button', {name: /remove from list/i}),
+  ).not.toBeInTheDocument()
 })
