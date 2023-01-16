@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-import '@testing-library/jest-dom'
-import {server} from 'test/server'
-=======
 import '@testing-library/jest-dom/extend-expect'
 import {act, waitFor} from '@testing-library/react'
 import {queryCache} from 'react-query'
@@ -13,20 +9,16 @@ import * as booksDB from 'test/data/books'
 
 // we don't need the profiler in tests
 jest.mock('components/profiler')
->>>>>>> 459d74fdddc904da339c6619ef4937bd302cc6ae
 
 // enable API mocking in test runs using the same request handlers
 // as for the client-side mocking.
 beforeAll(() => server.listen())
 afterAll(() => server.close())
 afterEach(() => server.resetHandlers())
-<<<<<<< HEAD
-=======
 
 // general cleanup
 afterEach(async () => {
   queryCache.clear()
-  // aren't dependent on each other, make them execute same time
   await Promise.all([
     auth.logout(),
     usersDB.reset(),
@@ -52,4 +44,3 @@ afterEach(async () => {
     jest.useRealTimers()
   }
 })
->>>>>>> 459d74fdddc904da339c6619ef4937bd302cc6ae

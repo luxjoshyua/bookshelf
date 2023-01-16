@@ -2,8 +2,8 @@
 
 export * from './api-client.exercise'
 
-// 💯 Test failure cases
-// export * from './api-client.extra-1'
+jest.mock('react-query')
+jest.mock('auth-provider', () => jest.createMockFromModule('auth-provider'))
 
 // 💯 Use `setupTests.js`
 // export * from './api-client.extra-2'
