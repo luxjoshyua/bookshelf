@@ -4,11 +4,7 @@
   "private": true,
   "author": "Kent C. Dodds <me@kentcdodds.com> (https://kentcdodds.com/)",
   "license": "GPL-3.0-only",
-<<<<<<< HEAD
-  "homepage": "https://exercises-12-testing-hooks-and-components.bookshelf.lol/",
-=======
   "homepage": "https://exercises-13-integration-testing.bookshelf.lol/",
->>>>>>> 459d74fdddc904da339c6619ef4937bd302cc6ae
   "engines": {
     "node": "14 || 16 || 18",
     "npm": ">=8.16.0"
