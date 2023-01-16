@@ -229,3 +229,42 @@ test('can remove a list item for the book', async () => {
     screen.queryByRole('button', {name: /remove from list/i}),
   ).not.toBeInTheDocument()
 })
+
+test('can mark a list item as read', async () => {
+  // interact directly with the database
+  // setup the test
+  const user = await loginAsUser()
+  const book = await booksDB.create(buildBook())
+  // book being loaded now has a listItem associated to it for the user who is logged in
+  // the way to test whether a list item is read, is that it needs to not have finishDate
+  // `buildListItem({owner: user, book, finishDate: null})
+  const listItem = await listItemsDB.create(
+    buildListItem({owner: user, book, finishDate: null}),
+  )
+
+  const route = `/book/${book.id}`
+  await render(<App />, {route, user})
+
+  const markAsReadBtn = screen.getByRole('button', {name: /mark as read/i})
+  await userEvent.click(markAsReadBtn)
+  // after clicking, expect the button to be disabled
+  expect(markAsReadBtn).toBeDisabled()
+
+  // wait for loading state to finish
+  await waitForLoadingToFinish()
+
+  expect(
+    screen.getByRole('button', {name: /mark as unread/i}),
+  ).toBeInTheDocument()
+  // once the book is read, can rate it, so the stars should be showing
+  expect(screen.getAllByRole('radio', {name: /star/i})).toHaveLength(5)
+
+  const startAndFinishDateNode = screen.getByLabelText(/start and finish date/i)
+  expect(startAndFinishDateNode).toHaveTextContent(
+    `${formatDate(listItem.startDate)} — ${formatDate(Date.now())}`,
+  )
+
+  expect(
+    screen.queryByRole('button', {name: /mark as read/i}),
+  ).not.toBeInTheDocument()
+})
