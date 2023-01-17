@@ -5,7 +5,6 @@ import {
   waitForLoadingToFinish,
   userEvent,
   loginAsUser,
-  waitFor,
 } from 'test/app-test-utils'
 import {buildBook, buildListItem} from 'test/generate'
 import faker from 'faker'
@@ -18,22 +17,45 @@ const fakeTimerUserEvent = userEvent.setup({
   advanceTimers: () => jest.runOnlyPendingTimers(),
 })
 
-test('renders all the book information', async () => {
-  // create a book using `buildBook`
-  // const book = buildBook()
-  // await booksDB.create(book)
-  const book = await booksDB.create(buildBook())
+// handles automatically creating a user, book, and listItem
+// if they're not provided
+async function renderBookScreen({user, book, listItem} = {}) {
+  if (user === undefined) {
+    user = await loginAsUser()
+  }
+  if (book === undefined) {
+    book = await booksDB.create(buildBook())
+  }
+  if (listItem === undefined) {
+    // associate the user and book with a specific owner
+    listItem = await listItemsDB.create(buildListItem({owner: user, book}))
+  }
 
-  // ref: https://developer.mozilla.org/en-US/docs/Web/API/History/pushState
   const route = `/book/${book.id}`
 
+  // render the app with the route and the user
+  const utils = await render(<App />, {route, user})
+
+  return {
+    //  forward along the utilities
+    ...utils,
+    user,
+    book,
+    listItem,
+  }
+}
+
+test('renders all the book information', async () => {
+  const {book} = await renderBookScreen({listItem: null})
+
+  // ref: https://developer.mozilla.org/en-US/docs/Web/API/History/pushState
   // reassign window.fetch to another function and handle the following requests
   // window.fetch = async (url, config) => { /* handle stuff here */ }
   // return Promise.resolve({ok: true, json: async () => ({ /* response data here */ })})
 
   // setting the wrapper to AppProviders means all the same providers
   // we have in the app will be available in our tests
-  await render(<App />, {route})
+  // await render(<App />, {route})
 
   // assert the book's info is in the document
   expect(screen.getByRole('heading', {name: book.title})).toBeInTheDocument()
@@ -47,7 +69,7 @@ test('renders all the book information', async () => {
   expect(screen.getByRole('button', {name: /add to list/i})).toBeInTheDocument()
 
   // check elements aren't in the document also
-  // using getByRole will throw an error because it can't get anything
+  // using getByRole will throw an error because it can't get anything immediately
   expect(
     screen.queryByRole('button', {name: /remove from list/i}),
   ).not.toBeInTheDocument()
@@ -67,11 +89,8 @@ test('renders all the book information', async () => {
 // we're testing what happens when we're on the book screen
 // and we add a book to our reading list
 test('can create a list item for the book', async () => {
-  const book = await booksDB.create(buildBook())
-  const route = `/book/${book.id}`
-  // window.history.pushState({}, 'page title', route)
-
-  await render(<App />, {route})
+  // render a book screen but set the listItem to be null
+  await renderBookScreen({listItem: null})
 
   // await waitForElementToBeRemoved(() => [
   //   // spresd the result of the query into an array
@@ -80,18 +99,11 @@ test('can create a list item for the book', async () => {
   // ])
 
   // now at single book screen
-  // screen.debug()
-  // screen.getByRole('whakdfdf')
 
   // click on the add to list button
   await userEvent.click(screen.getByRole('button', {name: /add to list/i}))
 
   // wait for the app to settle - all the loading indicators should be gone
-  // await waitForElementToBeRemoved(() => [
-  //   // spresd the result of the query into an array
-  //   ...screen.queryAllByLabelText(/loading/i),
-  //   ...screen.queryAllByText(/loading/i),
-  // ])
   await waitForLoadingToFinish()
 
   // verify the right elements appear on the screen now that this book has a list item
@@ -121,18 +133,7 @@ test('can create a list item for the book', async () => {
 })
 
 test('can remove a list item for the book', async () => {
-  // interact directly with the database
-  // book loading up already has a user associated to it
-  // for the user who's logged in
-  const user = await loginAsUser()
-
-  const book = await booksDB.create(buildBook())
-  // associate the book with the user
-  await listItemsDB.create(buildListItem({owner: user, book}))
-
-  const route = `/book/${book.id}`
-  // render the app with the route and the user
-  await render(<App />, {route, user})
+  await renderBookScreen()
 
   // click the remove from list button
   const removeFromListBtn = screen.getByRole('button', {
@@ -155,16 +156,8 @@ test('can remove a list item for the book', async () => {
 
 test('can mark a list item as read', async () => {
   // setup the test
-  const user = await loginAsUser()
-  const book = await booksDB.create(buildBook())
-  // book being loaded now has a listItem associated to it for the user who is logged in
-  // the way to test whether a list item is read, is that it needs to not have finishDate
-  const listItem = await listItemsDB.create(
-    buildListItem({owner: user, book, finishDate: null}),
-  )
-
-  const route = `/book/${book.id}`
-  await render(<App />, {route, user})
+  const {listItem} = await renderBookScreen()
+  await listItemsDB.update(listItem.id, {finishDate: null})
 
   const markAsReadBtn = screen.getByRole('button', {name: /mark as read/i})
   await userEvent.click(markAsReadBtn)
@@ -194,14 +187,7 @@ test('can edit a note', async () => {
   // using fake timers to skip debounce time - approx 300ms
   jest.useFakeTimers()
   // setup the test
-  const user = await loginAsUser()
-  const book = await booksDB.create(buildBook())
-  // associate the book with the user
-  const listItem = await listItemsDB.create(buildListItem({owner: user, book}))
-
-  const route = `/book/${book.id}`
-  // render the app with the route and the user
-  await render(<App />, {route, user})
+  const {listItem} = await renderBookScreen()
 
   const newNotes = faker.lorem.words()
   const notesTextBox = screen.getByRole('textbox', {name: /notes/i})
