@@ -5,7 +5,6 @@ import {
   waitForLoadingToFinish,
   userEvent,
   loginAsUser,
-  waitFor,
 } from 'test/app-test-utils'
 import {buildBook, buildListItem} from 'test/generate'
 import faker from 'faker'
@@ -18,94 +17,45 @@ const fakeTimerUserEvent = userEvent.setup({
   advanceTimers: () => jest.runOnlyPendingTimers(),
 })
 
-test('renders all the book information', async () => {
-  // create a user using `buildUser`
-  // const user = buildUser()
-  // await usersDB.create(user)
-  // const authUser = await usersDB.authenticate(user)
-  // authenticate the client by setting the auth.localStorageKey in localStorage
-  // to the token associated with the authenticated user
-  // window.localStorage.setItem(auth.localStorageKey, authUser.token)
+// handles automatically creating a user, book, and listItem
+// if they're not provided
+async function renderBookScreen({user, book, listItem} = {}) {
+  if (user === undefined) {
+    user = await loginAsUser()
+  }
+  if (book === undefined) {
+    book = await booksDB.create(buildBook())
+  }
+  if (listItem === undefined) {
+    // associate the user and book with a specific owner
+    listItem = await listItemsDB.create(buildListItem({owner: user, book}))
+  }
 
-  // create a book using `buildBook`
-  // const book = buildBook()
-  // await booksDB.create(book)
-
-  const book = await booksDB.create(buildBook())
-  // does the same but shorter syntax
-  // const book = await booksDB.create(buildBook())
-
-  // update the URL to `/book/${book.id}` because we need to be in that location for this test
-  // window.history.pushState({}, 'page title', route)
-  // ref: https://developer.mozilla.org/en-US/docs/Web/API/History/pushState
   const route = `/book/${book.id}`
-  // window.history.pushState({}, 'page title', route)
 
+  // render the app with the route and the user
+  const utils = await render(<App />, {route, user})
+
+  return {
+    //  forward along the utilities
+    ...utils,
+    user,
+    book,
+    listItem,
+  }
+}
+
+test('renders all the book information', async () => {
+  const {book} = await renderBookScreen({listItem: null})
+
+  // ref: https://developer.mozilla.org/en-US/docs/Web/API/History/pushState
   // reassign window.fetch to another function and handle the following requests
   // window.fetch = async (url, config) => { /* handle stuff here */ }
   // return Promise.resolve({ok: true, json: async () => ({ /* response data here */ })})
-  // endsWith() ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith
-  // this is being handled by the src/setupTests.js now
-  // const originalFetch = window.fetch
-  // window.fetch = async (url, config) => {
-  //   // if (!url) {
-  //   //   console.warn(url, config)
-  //   //   return Promise.reject(
-  //   //     new Error(`Need to handle: ${url} with config: ${config}`),
-  //   //   )
-  //   // }
-  //   // - url ends with `/bootstrap`: respond with {user, listItems: []}
-  //   if (url.endsWith(`/bootstrap`)) {
-  //     return Promise.resolve({
-  //       ok: true,
-  //       json: async () => ({
-  //         // response data here
-  //         user: {...user, token: 'WHATEVER_FAKE_TOKEN'},
-  //         listItems: [],
-  //       }),
-  //     })
-  //   }
-  //   // - url ends with `/list-items`: respond with {listItems: []}
-  //   else if (url.endsWith(`list-items`)) {
-  //     return Promise.resolve({
-  //       ok: true,
-  //       json: async () => ({
-  //         // response data here
-  //         listItems: [],
-  //       }),
-  //     })
-  //   }
-  //   // - url ends with `/books/${book.id}`: respond with {book}
-  //   else if (url.endsWith(`/books/${book.id}`)) {
-  //     return Promise.resolve({
-  //       ok: true,
-  //       json: async () => ({
-  //         // response data here
-  //         book,
-  //       }),
-  //     })
-  //   }
-  //   console.log(url, config)
-  //   return originalFetch(url, config)
-  // }
 
   // setting the wrapper to AppProviders means all the same providers
   // we have in the app will be available in our tests
-  await render(<App />, {route})
-
-  // check app is settled / screen isnt't still loading before we start checking if the book list is rendering properly
-  // await waitForElementToBeRemoved(() => screen.getByLabelText(/loading/i))
-  // await waitForElementToBeRemoved(() => [
-  //   // spresd the result of the query into an array
-  //   ...screen.queryAllByLabelText(/loading/i),
-  //   ...screen.queryAllByText(/loading/i),
-  // ])
-
-  // https://testing-library.com/docs/dom-testing-library/api-async#findby-queries
-  // check where we're up to
-  // screen.debug()
-  // find the available roles
-  // screen.getByRole('whatver')
+  // await render(<App />, {route})
 
   // assert the book's info is in the document
   expect(screen.getByRole('heading', {name: book.title})).toBeInTheDocument()
@@ -119,7 +69,7 @@ test('renders all the book information', async () => {
   expect(screen.getByRole('button', {name: /add to list/i})).toBeInTheDocument()
 
   // check elements aren't in the document also
-  // using getByRole will throw an error because it can't get anything
+  // using getByRole will throw an error because it can't get anything immediately
   expect(
     screen.queryByRole('button', {name: /remove from list/i}),
   ).not.toBeInTheDocument()
@@ -139,42 +89,16 @@ test('renders all the book information', async () => {
 // we're testing what happens when we're on the book screen
 // and we add a book to our reading list
 test('can create a list item for the book', async () => {
-  // get the app into the state we want
-  // const user = buildUser()
-  // await usersDB.create(user)
-  // const authUser = await usersDB.authenticate(user)
-  // window.localStorage.setItem(auth.localStorageKey, authUser.token)
-  // const book = buildBook()
-  // await booksDB.create(book)
-  const book = await booksDB.create(buildBook())
-  const route = `/book/${book.id}`
-  // window.history.pushState({}, 'page title', route)
-
-  await render(<App />, {route})
-
-  // await waitForElementToBeRemoved(() => [
-  //   // spresd the result of the query into an array
-  //   ...screen.queryAllByLabelText(/loading/i),
-  //   ...screen.queryAllByText(/loading/i),
-  // ])
+  // render a book screen but set the listItem to be null
+  await renderBookScreen({listItem: null})
 
   // now at single book screen
-  // screen.debug()
-  // screen.getByRole('whakdfdf')
 
   // click on the add to list button
   await userEvent.click(screen.getByRole('button', {name: /add to list/i}))
 
   // wait for the app to settle - all the loading indicators should be gone
-  // await waitForElementToBeRemoved(() => [
-  //   // spresd the result of the query into an array
-  //   ...screen.queryAllByLabelText(/loading/i),
-  //   ...screen.queryAllByText(/loading/i),
-  // ])
   await waitForLoadingToFinish()
-
-  // screen.debug()
-  // screen.getByRole('whakdfdf')
 
   // verify the right elements appear on the screen now that this book has a list item
   // mark as read
@@ -186,7 +110,6 @@ test('can create a list item for the book', async () => {
     screen.getByRole('button', {name: /remove from list/i}),
   ).toBeInTheDocument()
   // has date
-  // expect(screen.queryByLabelText(/start date/i)).toBeInTheDocument()
   // notes section
   expect(screen.getByRole('textbox', {name: /notes/i})).toBeInTheDocument()
 
@@ -204,18 +127,7 @@ test('can create a list item for the book', async () => {
 })
 
 test('can remove a list item for the book', async () => {
-  // interact directly with the database
-  // book loading up already has a user associated to it
-  // for the user who's logged in
-  const user = await loginAsUser()
-
-  const book = await booksDB.create(buildBook())
-  // associate the book with the user
-  await listItemsDB.create(buildListItem({owner: user, book}))
-
-  const route = `/book/${book.id}`
-  // render the app with the route and the user
-  await render(<App />, {route, user})
+  await renderBookScreen()
 
   // click the remove from list button
   const removeFromListBtn = screen.getByRole('button', {
@@ -237,19 +149,9 @@ test('can remove a list item for the book', async () => {
 })
 
 test('can mark a list item as read', async () => {
-  // interact directly with the database
   // setup the test
-  const user = await loginAsUser()
-  const book = await booksDB.create(buildBook())
-  // book being loaded now has a listItem associated to it for the user who is logged in
-  // the way to test whether a list item is read, is that it needs to not have finishDate
-  // `buildListItem({owner: user, book, finishDate: null})
-  const listItem = await listItemsDB.create(
-    buildListItem({owner: user, book, finishDate: null}),
-  )
-
-  const route = `/book/${book.id}`
-  await render(<App />, {route, user})
+  const {listItem} = await renderBookScreen()
+  await listItemsDB.update(listItem.id, {finishDate: null})
 
   const markAsReadBtn = screen.getByRole('button', {name: /mark as read/i})
   await userEvent.click(markAsReadBtn)
@@ -276,17 +178,10 @@ test('can mark a list item as read', async () => {
 })
 
 test('can edit a note', async () => {
-  // using fake timers to skip debounce time
+  // using fake timers to skip debounce time - approx 300ms
   jest.useFakeTimers()
   // setup the test
-  const user = await loginAsUser()
-  const book = await booksDB.create(buildBook())
-  // associate the book with the user
-  const listItem = await listItemsDB.create(buildListItem({owner: user, book}))
-
-  const route = `/book/${book.id}`
-  // render the app with the route and the user
-  await render(<App />, {route, user})
+  const {listItem} = await renderBookScreen()
 
   const newNotes = faker.lorem.words()
   const notesTextBox = screen.getByRole('textbox', {name: /notes/i})
@@ -306,8 +201,34 @@ test('can edit a note', async () => {
   await waitForLoadingToFinish()
 
   expect(notesTextBox).toHaveValue(newNotes)
+  // more specific
+  // await waitFor(() => expect(notesTextBox).toHaveValue(newNotes))
 
   expect(await listItemsDB.read(listItem.id)).toMatchObject({
     notes: newNotes,
+  })
+})
+
+describe('console errors', () => {
+  beforeAll(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterAll(() => {
+    console.error.mockRestore()
+  })
+
+  test('shows an error message when the book fails to load', async () => {
+    // create a book with an id that doesn't exist in the database
+    // and that does not have a listItem
+    // provide our own book that doesn't exist in the database
+    const book = {id: 'bad_id'}
+    await renderBookScreen({listItem: null, book})
+
+    // assert the error message appears
+    // expect(screen.getByRole('alert')).toBeInTheDocument()
+    expect(
+      (await screen.findByRole('alert')).textContent,
+    ).toMatchInlineSnapshot(`"There was an error: Book not found"`)
   })
 })
