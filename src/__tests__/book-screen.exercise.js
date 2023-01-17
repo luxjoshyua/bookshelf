@@ -92,12 +92,6 @@ test('can create a list item for the book', async () => {
   // render a book screen but set the listItem to be null
   await renderBookScreen({listItem: null})
 
-  // await waitForElementToBeRemoved(() => [
-  //   // spresd the result of the query into an array
-  //   ...screen.queryAllByLabelText(/loading/i),
-  //   ...screen.queryAllByText(/loading/i),
-  // ])
-
   // now at single book screen
 
   // click on the add to list button
@@ -212,5 +206,29 @@ test('can edit a note', async () => {
 
   expect(await listItemsDB.read(listItem.id)).toMatchObject({
     notes: newNotes,
+  })
+})
+
+describe('console errors', () => {
+  beforeAll(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterAll(() => {
+    console.error.mockRestore()
+  })
+
+  test('shows an error message when the book fails to load', async () => {
+    // create a book with an id that doesn't exist in the database
+    // and that does not have a listItem
+    // provide our own book that doesn't exist in the database
+    const book = {id: 'bad_id'}
+    await renderBookScreen({listItem: null, book})
+
+    // assert the error message appears
+    // expect(screen.getByRole('alert')).toBeInTheDocument()
+    expect(
+      (await screen.findByRole('alert')).textContent,
+    ).toMatchInlineSnapshot(`"There was an error: Book not found"`)
   })
 })
