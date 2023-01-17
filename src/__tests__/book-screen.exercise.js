@@ -19,93 +19,21 @@ const fakeTimerUserEvent = userEvent.setup({
 })
 
 test('renders all the book information', async () => {
-  // create a user using `buildUser`
-  // const user = buildUser()
-  // await usersDB.create(user)
-  // const authUser = await usersDB.authenticate(user)
-  // authenticate the client by setting the auth.localStorageKey in localStorage
-  // to the token associated with the authenticated user
-  // window.localStorage.setItem(auth.localStorageKey, authUser.token)
-
   // create a book using `buildBook`
   // const book = buildBook()
   // await booksDB.create(book)
-
   const book = await booksDB.create(buildBook())
-  // does the same but shorter syntax
-  // const book = await booksDB.create(buildBook())
 
-  // update the URL to `/book/${book.id}` because we need to be in that location for this test
-  // window.history.pushState({}, 'page title', route)
   // ref: https://developer.mozilla.org/en-US/docs/Web/API/History/pushState
   const route = `/book/${book.id}`
-  // window.history.pushState({}, 'page title', route)
 
   // reassign window.fetch to another function and handle the following requests
   // window.fetch = async (url, config) => { /* handle stuff here */ }
   // return Promise.resolve({ok: true, json: async () => ({ /* response data here */ })})
-  // endsWith() ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith
-  // this is being handled by the src/setupTests.js now
-  // const originalFetch = window.fetch
-  // window.fetch = async (url, config) => {
-  //   // if (!url) {
-  //   //   console.warn(url, config)
-  //   //   return Promise.reject(
-  //   //     new Error(`Need to handle: ${url} with config: ${config}`),
-  //   //   )
-  //   // }
-  //   // - url ends with `/bootstrap`: respond with {user, listItems: []}
-  //   if (url.endsWith(`/bootstrap`)) {
-  //     return Promise.resolve({
-  //       ok: true,
-  //       json: async () => ({
-  //         // response data here
-  //         user: {...user, token: 'WHATEVER_FAKE_TOKEN'},
-  //         listItems: [],
-  //       }),
-  //     })
-  //   }
-  //   // - url ends with `/list-items`: respond with {listItems: []}
-  //   else if (url.endsWith(`list-items`)) {
-  //     return Promise.resolve({
-  //       ok: true,
-  //       json: async () => ({
-  //         // response data here
-  //         listItems: [],
-  //       }),
-  //     })
-  //   }
-  //   // - url ends with `/books/${book.id}`: respond with {book}
-  //   else if (url.endsWith(`/books/${book.id}`)) {
-  //     return Promise.resolve({
-  //       ok: true,
-  //       json: async () => ({
-  //         // response data here
-  //         book,
-  //       }),
-  //     })
-  //   }
-  //   console.log(url, config)
-  //   return originalFetch(url, config)
-  // }
 
   // setting the wrapper to AppProviders means all the same providers
   // we have in the app will be available in our tests
   await render(<App />, {route})
-
-  // check app is settled / screen isnt't still loading before we start checking if the book list is rendering properly
-  // await waitForElementToBeRemoved(() => screen.getByLabelText(/loading/i))
-  // await waitForElementToBeRemoved(() => [
-  //   // spresd the result of the query into an array
-  //   ...screen.queryAllByLabelText(/loading/i),
-  //   ...screen.queryAllByText(/loading/i),
-  // ])
-
-  // https://testing-library.com/docs/dom-testing-library/api-async#findby-queries
-  // check where we're up to
-  // screen.debug()
-  // find the available roles
-  // screen.getByRole('whatver')
 
   // assert the book's info is in the document
   expect(screen.getByRole('heading', {name: book.title})).toBeInTheDocument()
@@ -139,13 +67,6 @@ test('renders all the book information', async () => {
 // we're testing what happens when we're on the book screen
 // and we add a book to our reading list
 test('can create a list item for the book', async () => {
-  // get the app into the state we want
-  // const user = buildUser()
-  // await usersDB.create(user)
-  // const authUser = await usersDB.authenticate(user)
-  // window.localStorage.setItem(auth.localStorageKey, authUser.token)
-  // const book = buildBook()
-  // await booksDB.create(book)
   const book = await booksDB.create(buildBook())
   const route = `/book/${book.id}`
   // window.history.pushState({}, 'page title', route)
@@ -173,9 +94,6 @@ test('can create a list item for the book', async () => {
   // ])
   await waitForLoadingToFinish()
 
-  // screen.debug()
-  // screen.getByRole('whakdfdf')
-
   // verify the right elements appear on the screen now that this book has a list item
   // mark as read
   expect(
@@ -186,7 +104,6 @@ test('can create a list item for the book', async () => {
     screen.getByRole('button', {name: /remove from list/i}),
   ).toBeInTheDocument()
   // has date
-  // expect(screen.queryByLabelText(/start date/i)).toBeInTheDocument()
   // notes section
   expect(screen.getByRole('textbox', {name: /notes/i})).toBeInTheDocument()
 
@@ -237,13 +154,11 @@ test('can remove a list item for the book', async () => {
 })
 
 test('can mark a list item as read', async () => {
-  // interact directly with the database
   // setup the test
   const user = await loginAsUser()
   const book = await booksDB.create(buildBook())
   // book being loaded now has a listItem associated to it for the user who is logged in
   // the way to test whether a list item is read, is that it needs to not have finishDate
-  // `buildListItem({owner: user, book, finishDate: null})
   const listItem = await listItemsDB.create(
     buildListItem({owner: user, book, finishDate: null}),
   )
@@ -276,7 +191,7 @@ test('can mark a list item as read', async () => {
 })
 
 test('can edit a note', async () => {
-  // using fake timers to skip debounce time
+  // using fake timers to skip debounce time - approx 300ms
   jest.useFakeTimers()
   // setup the test
   const user = await loginAsUser()
@@ -306,6 +221,8 @@ test('can edit a note', async () => {
   await waitForLoadingToFinish()
 
   expect(notesTextBox).toHaveValue(newNotes)
+  // more specific
+  // await waitFor(() => expect(notesTextBox).toHaveValue(newNotes))
 
   expect(await listItemsDB.read(listItem.id)).toMatchObject({
     notes: newNotes,
