@@ -5,12 +5,18 @@ import {
   waitForLoadingToFinish,
   userEvent,
   loginAsUser,
+  waitFor,
 } from 'test/app-test-utils'
 import {buildBook, buildListItem} from 'test/generate'
+import faker from 'faker'
 import {App} from 'app'
 import * as booksDB from 'test/data/books'
 import * as listItemsDB from 'test/data/list-items'
 import {formatDate} from 'utils/misc'
+
+const fakeTimerUserEvent = userEvent.setup({
+  advanceTimers: () => jest.runOnlyPendingTimers(),
+})
 
 test('renders all the book information', async () => {
   // create a user using `buildUser`
@@ -228,4 +234,80 @@ test('can remove a list item for the book', async () => {
   expect(
     screen.queryByRole('button', {name: /remove from list/i}),
   ).not.toBeInTheDocument()
+})
+
+test('can mark a list item as read', async () => {
+  // interact directly with the database
+  // setup the test
+  const user = await loginAsUser()
+  const book = await booksDB.create(buildBook())
+  // book being loaded now has a listItem associated to it for the user who is logged in
+  // the way to test whether a list item is read, is that it needs to not have finishDate
+  // `buildListItem({owner: user, book, finishDate: null})
+  const listItem = await listItemsDB.create(
+    buildListItem({owner: user, book, finishDate: null}),
+  )
+
+  const route = `/book/${book.id}`
+  await render(<App />, {route, user})
+
+  const markAsReadBtn = screen.getByRole('button', {name: /mark as read/i})
+  await userEvent.click(markAsReadBtn)
+  // after clicking, expect the button to be disabled
+  expect(markAsReadBtn).toBeDisabled()
+
+  // wait for loading state to finish
+  await waitForLoadingToFinish()
+
+  expect(
+    screen.getByRole('button', {name: /mark as unread/i}),
+  ).toBeInTheDocument()
+  // once the book is read, can rate it, so the stars should be showing
+  expect(screen.getAllByRole('radio', {name: /star/i})).toHaveLength(5)
+
+  const startAndFinishDateNode = screen.getByLabelText(/start and finish date/i)
+  expect(startAndFinishDateNode).toHaveTextContent(
+    `${formatDate(listItem.startDate)} — ${formatDate(Date.now())}`,
+  )
+
+  expect(
+    screen.queryByRole('button', {name: /mark as read/i}),
+  ).not.toBeInTheDocument()
+})
+
+test('can edit a note', async () => {
+  // using fake timers to skip debounce time
+  jest.useFakeTimers()
+  // setup the test
+  const user = await loginAsUser()
+  const book = await booksDB.create(buildBook())
+  // associate the book with the user
+  const listItem = await listItemsDB.create(buildListItem({owner: user, book}))
+
+  const route = `/book/${book.id}`
+  // render the app with the route and the user
+  await render(<App />, {route, user})
+
+  const newNotes = faker.lorem.words()
+  const notesTextBox = screen.getByRole('textbox', {name: /notes/i})
+
+  await fakeTimerUserEvent.clear(notesTextBox)
+  await fakeTimerUserEvent.type(notesTextBox, newNotes)
+
+  // this also works, is a simpler way to test notes field is editable
+  // userEvent.type(notesTextBox, 'some dummy value')
+  // await waitFor(() => {
+  //   expect(notesTextBox).toHaveValue('some dummy value')
+  // })
+
+  // wait for the loading spinner to show up
+  await screen.findByLabelText(/loading/i)
+  // wait for the loading spinner to go away
+  await waitForLoadingToFinish()
+
+  expect(notesTextBox).toHaveValue(newNotes)
+
+  expect(await listItemsDB.read(listItem.id)).toMatchObject({
+    notes: newNotes,
+  })
 })
