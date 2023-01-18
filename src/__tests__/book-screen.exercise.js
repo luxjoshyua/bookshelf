@@ -5,6 +5,7 @@ import {
   waitForLoadingToFinish,
   userEvent,
   loginAsUser,
+  waitFor,
 } from 'test/app-test-utils'
 import {buildBook, buildListItem} from 'test/generate'
 import faker from 'faker'
@@ -12,10 +13,14 @@ import {App} from 'app'
 import * as booksDB from 'test/data/books'
 import * as listItemsDB from 'test/data/list-items'
 import {formatDate} from 'utils/misc'
+import {server} from 'test/server'
+import {rest} from 'msw'
 
 const fakeTimerUserEvent = userEvent.setup({
   advanceTimers: () => jest.runOnlyPendingTimers(),
 })
+
+const apiURL = process.env.REACT_APP_API_URL
 
 // handles automatically creating a user, book, and listItem
 // if they're not provided
@@ -230,5 +235,57 @@ describe('console errors', () => {
     expect(
       (await screen.findByRole('alert')).textContent,
     ).toMatchInlineSnapshot(`"There was an error: Book not found"`)
+  })
+
+  // checks server errors
+  test('note update failures are displayed', async () => {
+    jest.useFakeTimers()
+
+    const {listItem} = await renderBookScreen()
+
+    // generate fake notes
+    const newNotes = faker.lorem.words()
+    // get the notes screen
+    const notesTextBox = screen.getByRole('textbox', {name: /notes/i})
+
+    // add a server handler after the server has already started that throws an error
+    const testErrorMessage = 'some test error message'
+    server.use(
+      rest.put(`${apiURL}/list-items/:listItemId`, async (req, res, ctx) => {
+        return res(
+          ctx.status(400),
+          ctx.json({status: 400, message: testErrorMessage}),
+        )
+      }),
+    )
+
+    userEvent.clear(notesTextBox)
+    // add the notes into the textbox AFTER the server error happens !
+    await fakeTimerUserEvent.type(notesTextBox, newNotes)
+
+    // wait for loading to finish
+    await screen.findByLabelText(/loading/i)
+    await waitForLoadingToFinish()
+
+    // check an error message displays
+    expect(screen.getByRole('alert')).toMatchInlineSnapshot(`
+      <div
+        class="css-1y7tz3h-NotesTextarea"
+        role="alert"
+      >
+        <span>
+          There was an error: 
+        </span>
+        <pre
+          class="css-1rd6eqo-ErrorMessage"
+        >
+          some test error message
+        </pre>
+      </div>
+    `)
+
+    expect(await listItemsDB.read(listItem.id)).not.toMatchObject({
+      notes: newNotes,
+    })
   })
 })
