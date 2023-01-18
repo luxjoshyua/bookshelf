@@ -4,7 +4,7 @@ describe('smoke', () => {
   it('should allow a typical user flow', () => {
     // create a faker user
     const user = buildUser()
-    // visit '/' (https://docs.cypress.io/api/commands/visit.html)
+    // visit the home route '/' (https://docs.cypress.io/api/commands/visit.html)
     cy.visit('/')
 
     // find the button named "register" and click it
@@ -15,9 +15,11 @@ describe('smoke', () => {
     // within the dialogue
     cy.findByRole('dialog').within(() => {
       // find the username field
-      cy.get('#username').type('FAKE_USERNAME')
+      // cy.get('#username').type('FAKE_USERNAME')
+      cy.get('#username').type(user.name)
       // find the password field
-      cy.get('#password').type('FAKE_PASSWORD')
+      // cy.get('#password').type('FAKE_PASSWORD')
+      cy.get('#password').type(user.password)
       // click the reigster button to submit the form
       cy.findByRole('button', {name: /register/i}).click()
     })
